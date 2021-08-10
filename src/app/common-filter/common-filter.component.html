@@ -1,0 +1,9 @@
+<form [formGroup]="packageForm">
+<ion-item>
+  <ion-label>Filter by Package</ion-label>
+  <ion-select multiple="false" (ionChange)="packageChange()" formControlName="gympackage">
+    <ion-select-option value="gym">Gym</ion-select-option>
+    <ion-select-option value="add">Additional Package</ion-select-option>
+  </ion-select>
+</ion-item>
+</form>

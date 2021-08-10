@@ -1,0 +1,28 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Balance Due</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-searchbar
+    showcancelbutton=""
+    (ionInput)="filterList($event)"
+  ></ion-searchbar>
+  <ion-list *ngIf="balanceArray.length">
+    <ion-item *ngFor="let i of balanceArray" (click)="openpopoup(i.id)">
+      <ion-avatar style="margin: auto;">
+        <img  [src]="i.img">
+      </ion-avatar>
+      <ion-label style="margin-left: 1rem;">
+        <h2>{{i.name}}</h2>
+        <p>Total Balance : {{i.bal}}</p>
+      </ion-label>
+    </ion-item>
+  
+  </ion-list>
+
+</ion-content>

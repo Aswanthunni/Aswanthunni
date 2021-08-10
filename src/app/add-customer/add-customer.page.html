@@ -1,0 +1,181 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{title}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="customerForm">
+        <ion-avatar style="margin: auto;margin-top: 1rem;" (click)="selectImage()">
+          <img  [src]="croppedImagepath" *ngIf="croppedImagepath">
+        </ion-avatar>
+
+    <ion-item lines="full">
+      <ion-label position="floating">Name</ion-label>
+      <ion-input type="text" formControlName="name"></ion-input>
+    </ion-item>
+
+    <ion-item lines="full">
+      <ion-label position="floating">Email</ion-label>
+      <ion-input type="email" formControlName="email" [class.invalid]="this.customerForm.controls.email.touched && this.customerForm.controls.email.invalid"></ion-input>
+    </ion-item>
+
+    <ion-item lines="full">
+      <ion-label position="floating">DOB</ion-label>
+      <ion-input type="text" formControlName="dob" (click)="showCalender('dob')" [readonly]="true"></ion-input>
+    </ion-item>
+
+    <ion-item lines="full">
+      <ion-label position="floating">Age</ion-label>
+      <ion-input type="text" formControlName="age" [readonly]="true"></ion-input>
+    </ion-item>
+
+    <ion-item lines="full">
+      <ion-label position="floating">Mobile</ion-label>
+      <ion-input type="number" formControlName="mobile"></ion-input>
+    </ion-item>
+
+    <!-- Radio buttons -->
+    <ion-radio-group formControlName="gender">
+      <ion-row>
+        <ion-col>
+          <ion-item>
+            <ion-label>Male</ion-label>
+            <ion-radio slot="start" value="male" [checked]="true"></ion-radio>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item>
+            <ion-label>Female</ion-label>
+            <ion-radio slot="start" value="female"></ion-radio>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-radio-group>
+
+    <ion-item lines="full">
+      <ion-label position="floating">Address 1</ion-label>
+      <ion-input type="text" formControlName="address1"></ion-input>
+    </ion-item>
+
+    <ion-item lines="full">
+      <ion-label position="floating">Address 2 (Optional)</ion-label>
+      <ion-input type="text" formControlName="address2"></ion-input>
+    </ion-item>
+
+    <ion-row>
+      <ion-item lines="full">
+        <ion-label position="floating">Height (cm)</ion-label>
+        <ion-input type="number" formControlName="height"></ion-input>
+      </ion-item>
+
+      <ion-item lines="full">
+        <ion-label position="floating">Weight (Kg)</ion-label>
+        <ion-input type="number" formControlName="weight" ></ion-input>
+      </ion-item>
+    </ion-row>
+
+    <ion-item lines="full">
+      <ion-label position="floating">Registration Fees</ion-label>
+      <ion-input type="number" formControlName="regfees"></ion-input>
+    </ion-item>
+
+    <!--Gym Package-->
+
+    <ion-item *ngIf="btntext==='save'">
+      <ion-label>Gym Package</ion-label>
+      <ion-toggle [(ngModel)]="gymRequired" (ionChange)="toggle($event)" [ngModelOptions]="{standalone: true}"></ion-toggle>
+    </ion-item>
+
+      <ion-item lines="full" *ngIf="gymRequired">
+            <ion-label>Package</ion-label>
+            <ion-select placeholder="Select Package" formControlName="gympackage" (ionChange)="gymPackageChange()" *ngIf="gymPackage && gymPackage.length">
+              <ion-select-option [value]="i.id" *ngFor="let i of gymPackage">{{i.name}} ({{i.details}}) - {{i.fees}}</ion-select-option>
+            </ion-select>
+      </ion-item>
+
+      <ion-item lines="full"  *ngIf="gymRequired">
+        <ion-label position="floating">Fees</ion-label>
+        <ion-input type="number" formControlName="gymFees" [readonly]="true"></ion-input>
+      </ion-item>
+
+      <ion-item lines="full"  *ngIf="gymRequired">
+        <ion-label position="floating">Total Paid</ion-label>
+        <ion-input type="number" formControlName="gymtotalpaid"></ion-input>
+      </ion-item>
+
+      <ion-item lines="full"  *ngIf="gymRequired">
+        <ion-label position="floating">Balance</ion-label>
+        <ion-input type="number" formControlName="gymbalance" [readonly]="true"></ion-input>
+      </ion-item>
+
+<ion-row  *ngIf="gymRequired">
+      <ion-item lines="full">
+        <ion-label position="floating">Payment Date</ion-label>
+        <ion-input type="text" formControlName="gympaydate" (click)="showCalender('gympaydate')" [readonly]="true"></ion-input>
+      </ion-item>
+
+      <ion-item lines="full">
+        <ion-label position="floating">Next Due Date</ion-label>
+        <ion-input type="text" formControlName="gymduedate" (click)="showCalender('gymduedate')" [readonly]="true"></ion-input>
+      </ion-item>
+    </ion-row>
+
+
+
+
+
+    <!--Add Package-->
+    <ion-item *ngIf="btntext==='save'">
+      <ion-label>Additional Package ?</ion-label>
+      <ion-toggle (ionChange)="toggle($event)" [(ngModel)]="addRequired" [ngModelOptions]="{standalone: true}"></ion-toggle>
+    </ion-item>
+
+      <ion-item lines="full" *ngIf="addRequired">
+            <ion-label>Package</ion-label>
+            <ion-select placeholder="Select Package" formControlName="adpackage" (ionChange)="adPackageChange()">
+              <ion-select-option value="{{i.id}}" *ngFor="let i of adPackage">{{i.name}} ({{i.details}}) - {{i.fees}}</ion-select-option>
+            </ion-select>
+      </ion-item>
+
+      <ion-item lines="full"  *ngIf="addRequired">
+        <ion-label position="floating">Fees</ion-label>
+        <ion-input type="number" formControlName="adFees" [readonly]="true"></ion-input>
+      </ion-item>
+
+      <ion-item lines="full"  *ngIf="addRequired">
+        <ion-label position="floating">Total Paid</ion-label>
+        <ion-input type="number" formControlName="adtotalpaid"></ion-input>
+      </ion-item>
+
+      <ion-item lines="full"  *ngIf="addRequired">
+        <ion-label position="floating">Balance</ion-label>
+        <ion-input type="number" formControlName="adbalance" [readonly]="true"></ion-input>
+      </ion-item>
+
+<ion-row  *ngIf="addRequired">
+      <ion-item lines="full">
+        <ion-label position="floating">Payment Date</ion-label>
+        <ion-input type="text" formControlName="adpaydate" (click)="showCalender('adpaydate')" [readonly]="true"></ion-input>
+      </ion-item>
+
+      <ion-item lines="full">
+        <ion-label position="floating">Next Due Date</ion-label>
+        <ion-input type="text" formControlName="adduedate" (click)="showCalender('adduedate')" [readonly]="true"></ion-input>
+      </ion-item>
+    </ion-row>
+  </form>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-row>
+      <ion-col>
+        <ion-button type="submit" color="danger" expand="block" [disabled]="!customerForm.valid || (btntext==='save' &&!(addRequired || gymRequired))" (click)="decideSave()">{{btntext}}</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>

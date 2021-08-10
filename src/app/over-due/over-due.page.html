@@ -1,0 +1,23 @@
+<app-common-filter (newItemEvent)="getEvent($event)"></app-common-filter>
+<ion-content [fullscreen]="true">
+  <!-- <ion-searchbar
+    showcancelbutton=""
+    (ionInput)="filterList($event)"
+  ></ion-searchbar> -->
+  <ion-list *ngIf="dueData.length">
+
+    <ion-item *ngFor="let i of dueData">
+      <ion-avatar style="margin: auto;">
+        <img  [src]="i.img">
+      </ion-avatar>
+      <ion-label style="margin-left: 1rem;">
+        <h2>{{i.name}}</h2>
+        <p>Due in {{i.duedate}}</p>
+      </ion-label>
+    </ion-item>
+  
+  </ion-list>
+
+  <ion-label *ngIf="!dueData.length">No Over Dues</ion-label>
+
+</ion-content>

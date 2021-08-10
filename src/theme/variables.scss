@@ -3,6 +3,7 @@
 
 /** Ionic CSS Variables **/
 :root {
+  --ion-font-family: 'My Custom Font';
   /** primary **/
   --ion-color-primary: #3880ff;
   --ion-color-primary-rgb: 56, 128, 255;
@@ -234,3 +235,25 @@
     --ion-card-background: #1e1e1e;
   }
 }
+
+@font-face {
+  font-family: 'My Custom Font';
+  font-style: normal;
+  font-weight: normal;
+  src: url('../assets/fonts/gotham/GothamLight.ttf');
+}
+
+@font-face {
+  font-family: 'My Custom Font';
+  font-style: normal;
+  font-weight: bold;
+  src: url('../assets/fonts/gotham/GothamBold.ttf');
+}
+
+@font-face {
+  font-family: 'My Custom Font';
+  font-style: italic;
+  font-weight: bold;
+  src: url('../assets/fonts/gotham/GothamBoldItalic.ttf');
+}
+

@@ -1,0 +1,47 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Package List</ion-title>
+  </ion-toolbar>
+  <app-common-filter (newItemEvent)="getEvent($event)"></app-common-filter>
+<ion-content [fullscreen]="true">
+  <ion-list>
+
+    <ion-card *ngFor="let i of fetchAllPackage" (click)="viewhistory(i.packageid)">
+      <ion-card-header>
+        <ion-card-title>{{i.packageName}} ({{i.packageDetails}})</ion-card-title>
+      </ion-card-header>
+    
+      <ion-card-content>
+        <ion-row>
+          <ion-col>
+           <p>Package Joined :</p>
+           <p>{{i.createdate}}</p>
+          </ion-col>
+          <ion-col>
+           <p>Last Paid  :</p>
+           <p>{{i.paymentdate}}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <p>Total Paid :</p>
+            <p>{{i.paid}}</p>
+          </ion-col>
+          <ion-col>
+           <p>Balance Amount :</p>
+           <p>{{i.balance}}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col *ngIf="i.isactive == 0">
+              <ion-button type="submit" color="danger" expand="block" [disabled]="true">DeActivated</ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-card-content>
+    </ion-card>
+
+  </ion-list>
+</ion-content>

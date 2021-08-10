@@ -1,0 +1,19 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ folder }} ff</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+      <ion-list>
+        <ion-item (click)="navigate('customer-mgmt')"><ion-label>Customer Management</ion-label></ion-item>
+        <ion-item (click)="navigate('/add-package')"><ion-label>Package</ion-label></ion-item>
+        <ion-item (click)="navigate('/additional-package')"><ion-label>Additional Package</ion-label></ion-item>
+        <ion-item (click)="navigate('/dues')"><ion-label>Dues</ion-label></ion-item>
+        <ion-item (click)="navigate('/history-customer-list')"><ion-label>Payment Report</ion-label></ion-item>
+        <ion-item (click)="navigate('/balance-due')"><ion-label>Balance Due</ion-label></ion-item>
+      </ion-list>
+</ion-content>

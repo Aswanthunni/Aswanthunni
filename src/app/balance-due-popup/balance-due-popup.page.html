@@ -1,0 +1,19 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Due list</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list *ngIf="balanceArray.length">
+    <ion-item *ngFor="let i of balanceArray">
+      <ion-label style="margin-left: 1rem;">
+        <h2>{{i.name}}</h2>
+        <p>Total Balance : {{i.bal}}</p>
+      </ion-label>
+      <ion-button type="submit" color="danger" expand="block" (click)="updatebalance(i)">Settle</ion-button>
+    </ion-item>
+  
+  </ion-list>
+
+</ion-content>

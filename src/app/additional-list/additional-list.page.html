@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Additional Package</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="addPackage()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <ion-list>
+
+    <ion-card *ngFor="let i of fetchAllPackage">
+      <ion-card-header>
+        <ion-card-title>{{i.packageName}} ({{i.packageDetails}})</ion-card-title>
+        <ion-card-subtitle>Fees : {{i.packageFees}}</ion-card-subtitle>
+      </ion-card-header>
+    
+      <ion-card-content>
+        <ion-row>
+          <ion-col>
+           <p>Package Joined :</p>
+           <p>{{i.createdate}}</p>
+          </ion-col>
+          <ion-col>
+           <p>Last Paid  :</p>
+           <p>{{i.paymentdate}}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <p>Total Paid :</p>
+            <p>{{i.paid}}</p>
+          </ion-col>
+          <ion-col>
+           <p>Balance Amount :</p>
+           <p>{{i.balance}}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col *ngIf="i.isactive == 1">
+            <p style="color: red">Due On : {{i.duedate}}</p>
+          </ion-col>
+          <ion-col *ngIf="i.isactive == 0">
+              <ion-button type="submit" color="danger" expand="block" [disabled]="true">DeActivated</ion-button>
+          </ion-col>
+        </ion-row>
+       <ion-row *ngIf="i.isactive == 1">
+         <ion-col>
+          <ion-button type="submit" color="danger" expand="block" (click)="delete(i.packageid)">Delete</ion-button>
+         </ion-col>
+
+         <!-- <ion-col>
+          <ion-button type="submit" color="primary" expand="block" (click)="updatePackage(i)">Update</ion-button>
+        </ion-col> -->
+       </ion-row>
+      </ion-card-content>
+    </ion-card>
+
+  </ion-list>
+  
+</ion-content>
