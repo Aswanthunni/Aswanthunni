@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { DbService } from '../db.service';
 
@@ -10,9 +11,11 @@ import { DbService } from '../db.service';
 export class HistoryCustomerListPage implements OnInit {
   custData = [];
   cloneArray = [];
-  constructor(private db: DbService, private nav: NavController) { }
+  path = '';
+  constructor(private db: DbService, private nav: NavController, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit() {
+    this.path = this.activatedRoute.snapshot.paramMap.get('id');
     this.fetchPackage()
   }
 
@@ -49,7 +52,11 @@ export class HistoryCustomerListPage implements OnInit {
 
     navigate(id) {
       const params = { id }
+      if (this.path === 'report') {
       this.nav.navigateForward('/history-package-list', { state: params });
+      } else if (this.path === 'trans') {
+        this.nav.navigateForward('/trans-list', { state: params });
+      }
     }
 
 }

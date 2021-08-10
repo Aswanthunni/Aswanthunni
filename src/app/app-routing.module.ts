@@ -56,7 +56,7 @@ const routes: Routes = [
     loadChildren: () => import('./popup-add-package/popup-add-package.module').then( m => m.PopupAddPackagePageModule)
   },
   {
-    path: 'history-customer-list',
+    path: 'history-customer-list/:id',
     loadChildren: () => import('./history-customer-list/history-customer-list.module').then( m => m.HistoryCustomerListPageModule)
   },
   {
@@ -78,6 +78,18 @@ const routes: Routes = [
   {
     path: 'balance-settle-popup',
     loadChildren: () => import('./balance-settle-popup/balance-settle-popup.module').then( m => m.BalanceSettlePopupPageModule)
+  },
+  {
+    path: 'trans-list',
+    loadChildren: () => import('./trans-list/trans-list.module').then( m => m.TransListPageModule)
+  },
+  {
+    path: 'trans-new',
+    loadChildren: () => import('./trans-new/trans-new.module').then( m => m.TransNewPageModule)
+  },
+  {
+    path: 'trans-update',
+    loadChildren: () => import('./trans-update/trans-update.module').then( m => m.TransUpdatePageModule)
   }
 ];
 

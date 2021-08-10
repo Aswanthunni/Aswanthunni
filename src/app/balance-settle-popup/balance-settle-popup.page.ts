@@ -50,17 +50,18 @@ export class BalanceSettlePopupPage implements OnInit {
     });
   }
 
-  // updateAddDue() {
-  //   let data = [id, this.customerForm.controls.adpackage.value, this.customerForm.controls.adtotalpaid.value,
-  //     this.customerForm.controls.adbalance.value, this.customerForm.controls.adpaydate.value,
-  //     this.customerForm.controls.adduedate.value, this.customerForm.controls.adpaydate.value, 1]
-  //   return this.db.storage.executeSql('INSERT INTO adpackagedue (customerid, packageid, totalpaid, balance, paymentdate, duedate, createdate, isactive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', data)
-  //   .then(res => {
-  //     alert(res);
-  //   }, (err) => {
-  //     alert(JSON.stringify(err));
-  //   });
-  // }
+  updateAddDue() {
+    const bal =  0 - +this.customerForm.controls.amount.value;
+    let data = [this.params.userId, this.params.packageid, this.customerForm.controls.amount.value,
+      bal, this.customerForm.controls.paydate.value,
+      this.params.duedate, this.params.createdate, 1]
+    return this.db.storage.executeSql('INSERT INTO adpackagedue (customerid, packageid, totalpaid, balance, paymentdate, duedate, createdate, isactive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', data)
+    .then(res => {
+      alert(res);
+    }, (err) => {
+      alert(JSON.stringify(err));
+    });
+  }
 
   showCalender() {
     this.datePicker.show({
@@ -81,7 +82,7 @@ export class BalanceSettlePopupPage implements OnInit {
     if (this.params.type === 'gym') {
         this.updateGymDue();
     } else if (this.params.type === 'ad') {
-      //  this.updateAddDue();
+        this.updateAddDue();
     }
   }
 

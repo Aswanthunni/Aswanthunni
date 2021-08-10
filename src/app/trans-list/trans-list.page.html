@@ -1,0 +1,34 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Transactions</ion-title>
+  </ion-toolbar>
+</ion-header>
+<app-common-filter (newItemEvent)="getEvent($event)"></app-common-filter>
+
+<ion-content [fullscreen]="true">
+  <ion-list>
+    <ion-item-sliding *ngFor="let i of history">
+      <ion-item-options side="end">
+        <ion-item-option (click)="updatePackage(i)">
+          <ion-icon slot="icon-only" name="pencil"></ion-icon>
+        </ion-item-option>
+        <ion-item-option color="danger">
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+  
+      <ion-item>
+        <ion-label>
+          <p>Plan : {{i.name}} ({{i.details}})</p>
+          <p>Amount : {{i.totalpaid}}</p>
+          <p>Paid Date : {{i.paymentdate}}</p>
+        </ion-label>
+      </ion-item>
+
+    </ion-item-sliding>
+  
+  </ion-list>
+</ion-content>

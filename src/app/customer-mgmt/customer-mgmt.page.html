@@ -23,15 +23,12 @@
       <ion-item-options side="end">
         <ion-item-option (click)="navigateEdit(i.id)">
           <ion-icon slot="icon-only" name="pencil"></ion-icon>
-          Edit
         </ion-item-option>
         <ion-item-option color="danger" (click)="presentAlertConfirm(i.id)">
           <ion-icon slot="icon-only" name="trash"></ion-icon>
-          Delete
         </ion-item-option>
-        <ion-item-option (click)="navigatePackage(i.id)">
-          <ion-icon slot="icon-only" name="pencil"></ion-icon>
-          Package
+        <ion-item-option (click)="navigatePackage(i.id)" color="secondary">
+          <ion-icon slot="icon-only" name="barbell"></ion-icon>
         </ion-item-option>
       </ion-item-options>
   
