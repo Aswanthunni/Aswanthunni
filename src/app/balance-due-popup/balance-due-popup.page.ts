@@ -20,7 +20,7 @@ export class BalanceDuePopupPage implements OnInit {
 
   sumtotalbalAd() {
     this.balanceArray = [];
-    return this.db.storage.executeSql('SELECT packageid, SUM(balance) as bal, name, createdate, duedate FROM adpackagedue INNER JOIN adpackagetable on adpackagetable.id = adpackagedue.packageid where customerid = ? GROUP BY packageid',[this.params.userId]).then(data => { 
+    return this.db.storage.executeSql('SELECT packageid, SUM(balance) as bal, name, createdate, duedate FROM adpackagedue INNER JOIN adpackagetable on adpackagetable.id = adpackagedue.packageid where customerid = ? GROUP BY packageid HAVING SUM(balance) > 0',[this.params.userId]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         item.type = 'ad';
@@ -33,7 +33,7 @@ export class BalanceDuePopupPage implements OnInit {
   }
 
   sumtotalbalGym() {
-    return this.db.storage.executeSql('SELECT packageid, SUM(balance) as bal, name, createdate, duedate  FROM gympackagedue INNER JOIN packagetable on packagetable.id = gympackagedue.packageid where customerid = ? GROUP BY packageid',[this.params.userId]).then(data => { 
+    return this.db.storage.executeSql('SELECT packageid, SUM(balance) as bal, name, createdate, duedate  FROM gympackagedue INNER JOIN packagetable on packagetable.id = gympackagedue.packageid where customerid = ? GROUP BY packageid HAVING SUM(balance) > 0',[this.params.userId]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         item.type = 'gym';

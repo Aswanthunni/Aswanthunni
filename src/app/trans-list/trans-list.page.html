@@ -9,13 +9,15 @@
 <app-common-filter (newItemEvent)="getEvent($event)"></app-common-filter>
 
 <ion-content [fullscreen]="true">
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="newPackage()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
   <ion-list>
     <ion-item-sliding *ngFor="let i of history">
       <ion-item-options side="end">
-        <ion-item-option (click)="updatePackage(i)">
-          <ion-icon slot="icon-only" name="pencil"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="danger">
+        <ion-item-option color="danger" (click)="delete(i.id)">
           <ion-icon slot="icon-only" name="trash"></ion-icon>
         </ion-item-option>
       </ion-item-options>

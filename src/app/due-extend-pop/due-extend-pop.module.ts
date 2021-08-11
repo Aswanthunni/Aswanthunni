@@ -4,17 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { TransUpdatePageRoutingModule } from './trans-update-routing.module';
+import { DueExtendPopPageRoutingModule } from './due-extend-pop-routing.module';
 
-import { TransUpdatePage } from './trans-update.page';
+import { DueExtendPopPage } from './due-extend-pop.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    TransUpdatePageRoutingModule
+    DueExtendPopPageRoutingModule
   ],
-  declarations: [TransUpdatePage]
+  declarations: [DueExtendPopPage]
 })
-export class TransUpdatePageModule {}
+export class DueExtendPopPageModule {}

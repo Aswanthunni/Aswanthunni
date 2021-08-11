@@ -56,6 +56,8 @@ export class HistoryCustomerListPage implements OnInit {
       this.nav.navigateForward('/history-package-list', { state: params });
       } else if (this.path === 'trans') {
         this.nav.navigateForward('/trans-list', { state: params });
+      } else if (this.path === 'due') {
+        this.nav.navigateForward('/due-extend', { state: params });
       }
     }
 

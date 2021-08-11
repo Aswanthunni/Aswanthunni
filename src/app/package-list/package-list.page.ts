@@ -29,7 +29,6 @@ export class PackageListPage implements OnInit {
         this.packageId.push(item.packageid)
         this.fetchAllPackage.push(item);
       }
-      alert(JSON.stringify(this.fetchAllPackage))
       this.sumtotalbal(id);
     },(err) => {
       alert(JSON.stringify(err));
@@ -71,7 +70,6 @@ export class PackageListPage implements OnInit {
       }
 
       if (index2 > -1) {
-        alert(this.balanceArray[index2].total)
         data.paid = this.balanceArray[index2].total;
         data.balance = this.balanceArray[index2].bal;
       }

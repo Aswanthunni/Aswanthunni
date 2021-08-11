@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { TransUpdatePage } from './trans-update.page';
+import { DueExtendPopPage } from './due-extend-pop.page';
 
-describe('TransUpdatePage', () => {
-  let component: TransUpdatePage;
-  let fixture: ComponentFixture<TransUpdatePage>;
+describe('DueExtendPopPage', () => {
+  let component: DueExtendPopPage;
+  let fixture: ComponentFixture<DueExtendPopPage>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ TransUpdatePage ],
+      declarations: [ DueExtendPopPage ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(TransUpdatePage);
+    fixture = TestBed.createComponent(DueExtendPopPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

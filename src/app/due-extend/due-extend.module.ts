@@ -4,21 +4,21 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { TransListPageRoutingModule } from './trans-list-routing.module';
+import { DueExtendPageRoutingModule } from './due-extend-routing.module';
 
-import { TransListPage } from './trans-list.page';
+import { DueExtendPage } from './due-extend.page';
 import { CommonFilterComponent } from '../common-filter/common-filter.component';
-import { TransNewPageModule } from '../trans-new/trans-new.module';
+import { DueExtendPopPageModule } from '../due-extend-pop/due-extend-pop.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    TransListPageRoutingModule,
+    DueExtendPageRoutingModule,
     ReactiveFormsModule,
-    TransNewPageModule
+    DueExtendPopPageModule
   ],
-  declarations: [TransListPage, CommonFilterComponent]
+  declarations: [DueExtendPage, CommonFilterComponent]
 })
-export class TransListPageModule {}
+export class DueExtendPageModule {}
