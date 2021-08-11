@@ -59,7 +59,23 @@ export class CustomerMgmtPage implements OnInit {
   deleteCustomer(id) {
     return this.db.storage.executeSql(`UPDATE customertable SET isactive = ? WHERE id = ${id}`, [0])
     .then(_ => {
+      this.updateGymDue(id);
+      this.updateAdDue(id);
       this.fetchPackage();
+    }, (err) => {
+      alert(JSON.stringify(err));
+    });
+  }
+
+  updateGymDue(id) {
+    return this.db.storage.executeSql('UPDATE gympackagedue SET isactive = 0 WHERE customerid = ?', [id]).then(res => {
+    }, (err) => {
+      alert(JSON.stringify(err));
+    });
+  }
+
+  updateAdDue(id) {
+    return this.db.storage.executeSql('UPDATE adpackagedue SET isactive = 0 WHERE customerid = ?', [id]).then(res => {
     }, (err) => {
       alert(JSON.stringify(err));
     });

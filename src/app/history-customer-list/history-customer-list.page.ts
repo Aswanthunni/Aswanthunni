@@ -16,13 +16,17 @@ export class HistoryCustomerListPage implements OnInit {
 
   ngOnInit() {
     this.path = this.activatedRoute.snapshot.paramMap.get('id');
-    this.fetchPackage()
+    if (this.path === 'due') {
+      this.fetchPackagedue();
+    } else {
+      this.fetchPackage()
+    }
   }
 
   fetchPackage() {
     //  this.db.showLoader();
       this.custData = [];
-      return this.db.storage.executeSql('SELECT * FROM customertable where isactive = 1',[]).then(data => { 
+      return this.db.storage.executeSql('SELECT * FROM customertable',[]).then(data => { 
      //   this.db.dismissLoader();
         for (let i = 0; i < data.rows.length; i++) {
           let item = data.rows.item(i);
@@ -34,6 +38,22 @@ export class HistoryCustomerListPage implements OnInit {
       //  this.db.dismissLoader();
       });
     }
+
+    fetchPackagedue() {
+      //  this.db.showLoader();
+        this.custData = [];
+        return this.db.storage.executeSql('SELECT * FROM customertable where isactive = 1',[]).then(data => { 
+       //   this.db.dismissLoader();
+          for (let i = 0; i < data.rows.length; i++) {
+            let item = data.rows.item(i);
+            this.custData.push(item);
+          }
+          this.cloneArray = this.custData;
+        },(err) => {
+          alert(JSON.stringify(err));
+        //  this.db.dismissLoader();
+        });
+      }
 
     filterList(evt) {
       const searchTerm = evt.srcElement.value;

@@ -94,6 +94,14 @@ const routes: Routes = [
   {
     path: 'due-extend-pop',
     loadChildren: () => import('./due-extend-pop/due-extend-pop.module').then( m => m.DueExtendPopPageModule)
+  },
+  {
+    path: 'backup',
+    loadChildren: () => import('./backup/backup.module').then( m => m.BackupPageModule)
+  },
+  {
+    path: 'dashboard',
+    loadChildren: () => import('./dashboard/dashboard.module').then( m => m.DashboardPageModule)
   }
 ];
 

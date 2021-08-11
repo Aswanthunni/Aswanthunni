@@ -1,0 +1,101 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Dashboard</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-row>
+    <ion-col>
+      <ion-card>
+      
+        <ion-card-content class="card-center">
+            
+      <ion-row>
+          <img  src="assets/dash-user.png" style="margin: auto;">
+        <ion-label style="margin-left: 1rem;">
+          <h2 class="card-head-1">Customer</h2>
+          <h4 class="count">{{totalCustomer}}</h4>
+        </ion-label>
+      </ion-row>
+        </ion-card-content>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+
+  <ion-row>
+    <ion-col>
+      <ion-card>
+      
+        <ion-card-content class="card-center">
+            
+      <ion-row>
+          <img  src="assets/dash-earn.png" style="margin: auto;">
+        <ion-label style="margin-left: 1rem;">
+          <h2 class="card-head-1">Earnings</h2>
+          <h4 class="count">₹{{earn}}</h4>
+        </ion-label>
+      </ion-row>
+        </ion-card-content>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+
+  <ion-row>
+    <ion-col>
+      <ion-card>
+      
+        <ion-card-content class="card-center">
+            
+      <ion-row>
+          <img  src="assets/warn-dash.png" style="margin: auto;">
+        <ion-label style="margin-left: 1rem;">
+          <h2 class="card-head-1">Dues</h2>
+          <h4 class="count">₹{{due}}</h4>
+        </ion-label>
+      </ion-row>
+        </ion-card-content>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+
+  <ion-row>
+    <ion-col>
+      <ion-card>
+      
+        <ion-card-content class="card-center">
+            
+      <ion-row>
+          <img  src="assets/dash-upcome.png" style="margin: auto;">
+        <ion-label style="margin-left: 1rem;">
+          <h2 class="card-head-1">Upcoming Due</h2>
+          <h4 class="count">{{updueCount}}</h4>
+        </ion-label>
+      </ion-row>
+        </ion-card-content>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+
+  <ion-row>
+    <ion-col>
+      <ion-card>
+      
+        <ion-card-content class="card-center">
+            
+      <ion-row>
+        <img  src="assets/dash-overdue.png" style="margin: auto;">
+        <ion-label style="margin-left: 1rem;">
+          <h2 class="card-head-1">Over Due</h2>
+          <h4 class="count">{{overdueCount}}</h4>
+        </ion-label>
+      </ion-row>
+        </ion-card-content>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+
+
+</ion-content>
