@@ -8,5 +8,24 @@
 </ion-header>
 
 <ion-content>
+   <ion-fab vertical="bottom" horizontal="end" slot="fixed" >
+    <ion-fab-button>
+      <label for="input-file" style="font-size: 20pt;padding-top: .4rem;">
+        <ion-icon name="refresh-circle"></ion-icon>
+      </label>
+      <input id="input-file" type="file" class="hideInput">
+    </ion-fab-button>
+  </ion-fab>
 
+  <div>
+    <img src="assets/cloud.png" style="  display: block;
+    margin-left: auto;
+    margin-right: auto;width:40%;margin-top:20%">
+  </div>
+  <div>
+    <ion-button type="submit" expand="block" (click)="export()" style="margin: 2rem;">backup</ion-button>
+    <ion-label>
+      <p style="text-align: center;">Last Backup : 12/02/03</p>
+    </ion-label>
+  </div>
 </ion-content>

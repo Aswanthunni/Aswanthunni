@@ -30,14 +30,12 @@ export class AppComponent {
 
 
   getPermission() {
-    alert(JSON.stringify('ll'))
     this.androidPermissions.hasPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE)
       .then(status => {
-        alert(JSON.stringify(status))
         if (status.hasPermission) {
         } 
         else {
-          this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE)
+          this.androidPermissions.requestPermissions([this.androidPermissions.PERMISSION.READ_EXTERNAL_STORAGE,this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE])
             .then(status => {
               if(status.hasPermission) {
               }

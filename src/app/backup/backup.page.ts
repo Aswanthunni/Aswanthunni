@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { File } from '@ionic-native/file/ngx';
 import { SqliteDbCopy } from '@ionic-native/sqlite-db-copy/ngx';
+import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
 import { Platform } from '@ionic/angular';
+import { DbService } from '../db.service';
 
 
 @Component({
@@ -12,67 +14,114 @@ import { Platform } from '@ionic/angular';
 })
 export class BackupPage implements OnInit {
 
-  constructor(private file: File, public  platform: Platform, private sqliteDbCopy: SqliteDbCopy, private androidPermissions: AndroidPermissions) { }
+  constructor(private file: File, public platform: Platform, private sqliteDbCopy: SqliteDbCopy, private androidPermissions: AndroidPermissions, private dbS: DbService) { }
 
   ngOnInit() {
-    this.platform.ready().then(() =>{
-      if(this.platform.is('android')) {
+    this.platform.ready().then(() => {
+      if (this.platform.is('android')) {
         this.getPermission();
-}
-  });
-}
+      }
+    });
+  }
 
   getPermission() {
+    this.showFile();
+    this.androidPermissions.requestPermissions(
+      [
+        this.androidPermissions.PERMISSION.CAMERA,
+        this.androidPermissions.PERMISSION.GET_ACCOUNTS,
+        this.androidPermissions.PERMISSION.READ_EXTERNAL_STORAGE,
+        this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE
+      ]
+    );
     this.androidPermissions.hasPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE)
       .then(status => {
         if (status.hasPermission) {
-          this.copyDB();
-        } 
+          //    this.checkFile();
+        }
         else {
           this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE)
             .then(status => {
-              if(status.hasPermission) {
-                this.copyDB();
+              if (status.hasPermission) {
+                //      this.checkFile();
               }
             });
         }
       });
-    }
+  }
 
-    createDir() {
-      alert(this.file.externalRootDirectory);
-      this.file.checkDir(this.file.externalRootDirectory, 'Download').then(response => {
-        this.sqliteDbCopy.copyDbToStorage('gym.db', 0, this.file.externalRootDirectory + "Download/",true).then((res) => {
-          alert(JSON.stringify(res));
-        }).catch((err) => {
-          alert(JSON.stringify(err))
-        })
-      }).catch(err => {
-        alert(JSON.stringify(err));
-      });
-    }
-
-    copyDB() {
-      alert(this.file.externalRootDirectory);
-      this.file.checkDir(this.file.externalRootDirectory, 'Download').then(response => {
-        alert(JSON.stringify(response))
-        this.sqliteDbCopy.copyDbFromStorage('gym.db', 0, this.file.externalRootDirectory + "Download/gym.db",true).then((res) => {
-          alert(JSON.stringify(res));
-        }).catch((err) => {
-          alert(JSON.stringify(err))
-        })
-      }).catch(err => {
-        alert(JSON.stringify(err));
-      });
-    }
-
-    checkFile() {
-      this.file.checkFile(this.file.externalRootDirectory + "Download/", 'gym.db').then((res) => {
+  createDir() {
+    alert(this.file.externalRootDirectory);
+    this.file.checkDir(this.file.externalRootDirectory, 'Download').then(response => {
+      this.sqliteDbCopy.copyDbToStorage('gym.db', 0, this.file.externalRootDirectory + "Download/", true).then((res) => {
         alert(JSON.stringify(res));
       }).catch((err) => {
-        alert(JSON.stringify(err));
+        alert(JSON.stringify(err))
+      })
+    }).catch(err => {
+      alert(JSON.stringify(err));
+    });
+  }
+
+  copyDB() {
+    alert(this.file.externalRootDirectory);
+    this.file.checkDir(this.file.externalRootDirectory, 'Download').then(response => {
+      alert(JSON.stringify(response))
+      this.sqliteDbCopy.copyDbFromStorage('gym.db', 0, this.file.externalRootDirectory + "Download/gym.db", true).then((res) => {
+        alert('Hi' + JSON.stringify(res));
+      }).catch((err) => {
+        alert('Hi2' + JSON.stringify(err))
+      });
+    }).catch(err => {
+      alert('Hi3' + JSON.stringify(err));
+    });
+  }
+
+  checkFile() {
+    this.file.checkFile(this.file.applicationDirectory + "www/assets/", 'package.sql').then((res) => {
+      alert(JSON.stringify(res));
+    }).catch((err) => {
+      alert(JSON.stringify(err));
+    })
+  }
+
+  showFile() {
+    let self = this;
+    document.getElementById('input-file')
+      .addEventListener('change', getFile)
+
+    function getFile(event) {
+      const input = event.target
+      if ('files' in input && input.files.length > 0) {
+        var sFileName = input.value;
+        var sCurExtension = 'sql'
+        if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+          placeFileContent(input.files[0])
+        } else {
+          alert('False')
+        }
+      }
+    }
+
+    function placeFileContent(file) {
+      readFileContent(file).then(content => {
+        self.dbS.replacedb(content);
+      }).catch(error => console.log(error))
+    }
+
+    function readFileContent(file) {
+      const reader = new FileReader()
+      return new Promise((resolve, reject) => {
+        reader.onload = event => resolve(event.target.result)
+        reader.onerror = error => reject(error)
+        reader.readAsText(file)
       })
     }
-  
+
+  }
+
+  export() {
+   this.dbS.export();
+  }
 
 }
