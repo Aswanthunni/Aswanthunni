@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController, NavController } from '@ionic/angular';
+import { AlertController, ModalController, NavController } from '@ionic/angular';
 import { DbService } from '../db.service';
+import { ImagePreviewPage } from '../image-preview/image-preview.page';
 
 @Component({
   selector: 'app-customer-mgmt',
@@ -10,7 +11,7 @@ import { DbService } from '../db.service';
 export class CustomerMgmtPage implements OnInit {
   customerData = [];
   cloneArray = [];
-  constructor(private nav: NavController, private db: DbService, private alertCtrl: AlertController) { }
+  constructor(private nav: NavController, private db: DbService, private alertCtrl: AlertController, private modalController: ModalController) { }
 
   ngOnInit() {
     this.fetchPackage();
@@ -111,5 +112,19 @@ export class CustomerMgmtPage implements OnInit {
     this.nav.navigateForward('/package-manager', { state: params });
   }
 
+  async imagePreview(data) {
+    const modal = await this.modalController.create({
+      component: ImagePreviewPage,
+      componentProps : {params : data},
+      swipeToClose: true,
+      presentingElement: await this.modalController.getTop() // Get the top-most ion-modal
+    });
+
+    modal.onDidDismiss().then((data) => {
+      
+    })
+
+    return await modal.present()
+  }
 
 }

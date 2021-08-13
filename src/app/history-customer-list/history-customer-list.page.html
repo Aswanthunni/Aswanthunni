@@ -22,6 +22,8 @@
         <h2>{{i.name}}</h2>
         <p>{{i.mobile}}</p>
       </ion-label>
+      <ion-icon name="cloud-done" item-right style="color: green;" *ngIf="i.isactive == 1 && path !== 'due'"></ion-icon>
+      <ion-icon name="cloud-offline" item-right style="color: red;" *ngIf="i.isactive == 0 && path !== 'due'"></ion-icon>
     </ion-item>
   
   </ion-list>

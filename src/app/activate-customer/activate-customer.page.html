@@ -1,9 +1,6 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>Customer Management</ion-title>
+    <ion-title>activate-customer</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -21,19 +18,13 @@
   <ion-list *ngIf="customerData.length">
     <ion-item-sliding *ngFor="let i of customerData">
       <ion-item-options side="end">
-        <ion-item-option (click)="navigateEdit(i.id)">
-          <ion-icon slot="icon-only" name="pencil"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="danger" (click)="presentAlertConfirm(i.id)">
-          <ion-icon slot="icon-only" name="trash"></ion-icon>
-        </ion-item-option>
-        <ion-item-option (click)="navigatePackage(i.id)" color="secondary">
-          <ion-icon slot="icon-only" name="barbell"></ion-icon>
+        <ion-item-option (click)="presentAlertConfirm(i.id)">
+          <ion-icon slot="icon-only" name="refresh-circle"></ion-icon>
         </ion-item-option>
       </ion-item-options>
   
       <ion-item>
-        <ion-avatar style="margin: auto;" (click)="imagePreview(i.img)">
+        <ion-avatar style="margin: auto;">
           <img  [src]="i.img">
         </ion-avatar>
         <ion-label style="margin-left: 1rem;">

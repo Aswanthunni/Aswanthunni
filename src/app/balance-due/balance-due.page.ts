@@ -19,7 +19,7 @@ export class BalanceDuePage implements OnInit {
 
   sumtotalbalAd() {
     this.balanceArray = [];
-    return this.db.storage.executeSql('SELECT SUM(balance) as bal, name , customertable.id as id, img FROM adpackagedue INNER JOIN customertable on customertable.id = adpackagedue.customerid GROUP BY customerid HAVING SUM(balance) > 0',[]).then(data => { 
+    return this.db.storage.executeSql('SELECT SUM(balance) as bal, name , customertable.id as id, img, customertable.isactive as active FROM adpackagedue INNER JOIN customertable on customertable.id = adpackagedue.customerid GROUP BY customerid HAVING SUM(balance) > 0',[]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.balanceArray.push(item);
@@ -31,7 +31,7 @@ export class BalanceDuePage implements OnInit {
   }
 
   sumtotalbalGym() {
-    return this.db.storage.executeSql('SELECT SUM(balance) as bal, name , customertable.id as id, img FROM gympackagedue INNER JOIN customertable on customertable.id = gympackagedue.customerid GROUP BY customerid HAVING SUM(balance) > 0',[]).then(data => { 
+    return this.db.storage.executeSql('SELECT SUM(balance) as bal, name , customertable.id as id, img, customertable.isactive as active FROM gympackagedue INNER JOIN customertable on customertable.id = gympackagedue.customerid GROUP BY customerid HAVING SUM(balance) > 0',[]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.balanceArray.push(item);
@@ -56,6 +56,7 @@ export class BalanceDuePage implements OnInit {
   for (let key in mutate) {
     this.balanceArray.push(mutate[key])
   }
+  this.balanceArray.sort((a, b) => b.active - a.active || a.name.localeCompare(b.name));
   this.cloneArray = this.balanceArray;
   }
 

@@ -102,6 +102,14 @@ const routes: Routes = [
   {
     path: 'dashboard',
     loadChildren: () => import('./dashboard/dashboard.module').then( m => m.DashboardPageModule)
+  },
+  {
+    path: 'activate-customer',
+    loadChildren: () => import('./activate-customer/activate-customer.module').then( m => m.ActivateCustomerPageModule)
+  },
+  {
+    path: 'image-preview',
+    loadChildren: () => import('./image-preview/image-preview.module').then( m => m.ImagePreviewPageModule)
   }
 ];
 

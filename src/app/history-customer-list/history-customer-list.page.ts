@@ -32,6 +32,7 @@ export class HistoryCustomerListPage implements OnInit {
           let item = data.rows.item(i);
           this.custData.push(item);
         }
+        this.custData.sort((a, b) => b.isactive - a.isactive || a.name.localeCompare(b.name));
         this.cloneArray = this.custData;
       },(err) => {
         alert(JSON.stringify(err));
