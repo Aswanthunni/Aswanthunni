@@ -13,7 +13,7 @@ import { DbService } from '../db.service';
   styleUrls: ['./backup.page.scss'],
 })
 export class BackupPage implements OnInit {
-
+  lastLog = [];
   constructor(private file: File, public platform: Platform, private sqliteDbCopy: SqliteDbCopy, private androidPermissions: AndroidPermissions, private dbS: DbService) { }
 
   ngOnInit() {
@@ -22,6 +22,10 @@ export class BackupPage implements OnInit {
         this.getPermission();
       }
     });
+
+    this.dbS.returnbackup().subscribe((res) => {
+        this.getbackupdate();
+    })
   }
 
   getPermission() {
@@ -48,33 +52,6 @@ export class BackupPage implements OnInit {
             });
         }
       });
-  }
-
-  createDir() {
-    alert(this.file.externalRootDirectory);
-    this.file.checkDir(this.file.externalRootDirectory, 'Download').then(response => {
-      this.sqliteDbCopy.copyDbToStorage('gym.db', 0, this.file.externalRootDirectory + "Download/", true).then((res) => {
-        alert(JSON.stringify(res));
-      }).catch((err) => {
-        alert(JSON.stringify(err))
-      })
-    }).catch(err => {
-      alert(JSON.stringify(err));
-    });
-  }
-
-  copyDB() {
-    alert(this.file.externalRootDirectory);
-    this.file.checkDir(this.file.externalRootDirectory, 'Download').then(response => {
-      alert(JSON.stringify(response))
-      this.sqliteDbCopy.copyDbFromStorage('gym.db', 0, this.file.externalRootDirectory + "Download/gym.db", true).then((res) => {
-        alert('Hi' + JSON.stringify(res));
-      }).catch((err) => {
-        alert('Hi2' + JSON.stringify(err))
-      });
-    }).catch(err => {
-      alert('Hi3' + JSON.stringify(err));
-    });
   }
 
   checkFile() {
@@ -122,6 +99,17 @@ export class BackupPage implements OnInit {
 
   export() {
    this.dbS.export();
+  }
+
+  getbackupdate() {
+    return this.dbS.storage.executeSql('SELECT * FROM backup WHERE id IN (SELECT MAX(id) FROM backup)',[]).then(data => { 
+      for (let i = 0; i < data.rows.length; i++) {
+        let item = data.rows.item(i);
+        this.lastLog.push(item);
+      }
+    },(err) => {
+      alert(JSON.stringify(err));
+    });
   }
 
 }

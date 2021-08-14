@@ -4,7 +4,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content [fullscreen]="true">
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="addPackage()">
       <ion-icon name="add"></ion-icon>
@@ -15,7 +15,7 @@
     <ion-card *ngFor="let i of fetchAllPackage">
       <ion-card-header>
         <ion-card-title>{{i.packageName}} ({{i.packageDetails}})</ion-card-title>
-        <ion-card-subtitle>Fees : {{i.packageFees}}</ion-card-subtitle>
+        <ion-card-subtitle>Fees : ₹{{i.packageFees}}</ion-card-subtitle>
       </ion-card-header>
     
       <ion-card-content>
@@ -60,5 +60,7 @@
     </ion-card>
 
   </ion-list>
-  
+  <div style="display: flex;justify-content: center;align-items: center;font-weight: bold;margin-top: 3rem;" *ngIf="!fetchAllPackage.length">
+    No Additional Package Found
+  </div>
 </ion-content>

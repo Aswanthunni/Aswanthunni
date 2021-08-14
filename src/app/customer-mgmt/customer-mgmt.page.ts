@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AlertController, ModalController, NavController } from '@ionic/angular';
 import { DbService } from '../db.service';
 import { ImagePreviewPage } from '../image-preview/image-preview.page';
@@ -8,13 +8,21 @@ import { ImagePreviewPage } from '../image-preview/image-preview.page';
   templateUrl: './customer-mgmt.page.html',
   styleUrls: ['./customer-mgmt.page.scss'],
 })
-export class CustomerMgmtPage implements OnInit {
+export class CustomerMgmtPage implements OnInit, OnDestroy {
   customerData = [];
   cloneArray = [];
   constructor(private nav: NavController, private db: DbService, private alertCtrl: AlertController, private modalController: ModalController) { }
+  ngOnDestroy(): void {
+    this.db.customerCreate.next('')
+  }
 
   ngOnInit() {
     this.fetchPackage();
+    this.db.fetchCustomAdd().subscribe((res) => {
+      if (res === 'created') {
+           this.fetchPackage();
+      }
+    })
   }
 
   addCustomer() {
@@ -22,10 +30,10 @@ export class CustomerMgmtPage implements OnInit {
   }
 
   fetchPackage() {
-  //  this.db.showLoader();
+ // this.db.showLoader();
     this.customerData = [];
     return this.db.storage.executeSql('SELECT * FROM customertable where isactive = 1',[]).then(data => { 
-   //   this.db.dismissLoader();
+ //  this.db.dismissLoader();
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.customerData.push(item);
@@ -33,7 +41,7 @@ export class CustomerMgmtPage implements OnInit {
       this.cloneArray = this.customerData;
     },(err) => {
       alert(JSON.stringify(err));
-    //  this.db.dismissLoader();
+  //  this.db.dismissLoader();
     });
   }
 
@@ -108,8 +116,8 @@ export class CustomerMgmtPage implements OnInit {
   }
   
   navigatePackage(id) {
-    const params = { type : 'update', id }
-    this.nav.navigateForward('/package-manager', { state: params });
+    this.db.userId = id;
+    this.nav.navigateForward('/package-manager');
   }
 
   async imagePreview(data) {

@@ -19,7 +19,10 @@ export interface Song {
 })
 export class DbService {
   public storage: SQLiteObject;
-  songsList = new BehaviorSubject([]);
+  customerCreate = new BehaviorSubject('');
+  balSettle = new BehaviorSubject('');
+  backup = new BehaviorSubject('');
+  userId = '';
   private isDbReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(
@@ -47,9 +50,19 @@ export class DbService {
     return this.isDbReady.asObservable();
   }
 
-  fetchSongs(): Observable<Song[]> {
-    return this.songsList.asObservable();
+  fetchCustomAdd() {
+    return this.customerCreate.asObservable();
   }
+
+  returnbalSettle() {
+    return this.balSettle.asObservable();
+  }
+
+  returnbackup() {
+    return this.backup.asObservable();
+  }
+
+
   // Render fake data
   createPackageTable() {
     this.httpClient.get(
@@ -110,12 +123,11 @@ export class DbService {
   }
 
   // Simple loader
-  showLoader() {
-    this.loadingController.create({
-      message: 'Loading...'
-    }).then((response) => {
-      response.present();
+  async showLoader() {
+    const loading = await this.loadingController.create({
+      message: 'Please Wait...',
     });
+    loading.present();
   }
 
   // Dismiss loader
@@ -129,7 +141,7 @@ export class DbService {
 
   replacedb(data) {
     this.sqlPorter.importSqlToDb(this.storage, data).then((res) => {
-      alert(JSON.stringify(res));
+      alert('Data Restored Successfully');
     }).catch((err) => {
       alert(JSON.stringify(err))
     })
@@ -138,11 +150,20 @@ export class DbService {
   export() {
     const uni = new Date().valueOf();
     this.sqlPorter.exportDbToSql(this.storage).then((res) => {
-      alert(JSON.stringify(res))
       this.file.writeFile(this.file.externalRootDirectory + 'Download/', uni+'.sql', res).then((res) => {
-        alert(JSON.stringify(res))
+        this.logbackup();
       }).catch(error => alert(JSON.stringify(error)));
     }).catch(error => alert(JSON.stringify(error)));
+  }
+
+  logbackup() {
+    const dateTime = new Date();
+    const dFormat = dateTime.getDate()+" "+dateTime.toLocaleString('default', { month: 'short' })+" "+dateTime.getFullYear();
+    return this.storage.executeSql('INSERT INTO backup (lastdate) VALUES (?)', [dFormat])
+      .then(res => {
+        alert('Database backup is successfull');
+        this.backup.next('');
+      });
   }
 
 }

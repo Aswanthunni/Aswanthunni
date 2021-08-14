@@ -1,6 +1,7 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Due list</ion-title>
+    <div class="toolbar-background toolbar-background-ios"></div>
+    <ion-title style="color: white;font-weight: normal;">Due list</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -8,10 +9,10 @@
   <ion-list *ngIf="balanceArray.length">
     <ion-item *ngFor="let i of balanceArray">
       <ion-label style="margin-left: 1rem;">
-        <h2>{{i.name}}</h2>
-        <p>Total Balance : {{i.bal}}</p>
+        <h2>{{i.name}} ({{i.details}})</h2>
+        <p>Total Balance : ₹{{i.bal}}</p>
       </ion-label>
-      <ion-button type="submit" color="danger" expand="block" (click)="updatebalance(i)">Settle</ion-button>
+      <ion-button type="submit" color="primary" expand="block" (click)="updatebalance(i)">Settle</ion-button>
     </ion-item>
   
   </ion-list>

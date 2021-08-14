@@ -1,6 +1,7 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>balance-settle-popup</ion-title>
+    <div class="toolbar-background toolbar-background-ios"></div>
+    <ion-title style="color: white;font-weight: normal;">Due Settle</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -25,10 +26,17 @@
     <ion-input type="text" formControlName="paydate" (click)="showCalender()" [readonly]="true"></ion-input>
   </ion-item>
 
+  <ion-item lines="full">
+    <ion-label position="floating">Comments</ion-label>
+    <ion-input type="text" formControlName="comments"></ion-input>
+  </ion-item>
+
   <ion-row>
     <ion-col>
-      <ion-button type="submit" color="primary" expand="block" [disabled]="!customerForm.valid" (click)="decideSave()">Save</ion-button>
       <ion-button type="submit" color="danger" expand="block" (click)="closePop()">Cancel</ion-button>
+    </ion-col>
+    <ion-col>
+      <ion-button type="submit" color="primary" expand="block" [disabled]="!customerForm.valid" (click)="decideSave()">Save</ion-button>
     </ion-col>
   </ion-row>
 </form>

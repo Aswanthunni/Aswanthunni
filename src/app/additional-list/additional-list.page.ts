@@ -15,10 +15,12 @@ export class AdditionalListPage implements OnInit {
   AllPackage = [];
   packageId = [];
   balanceArray = [];
-  constructor(private activatedRoute: ActivatedRoute, public db: DbService, public modalController: ModalController, private alertCtrl: AlertController) { }
+  userId = '';
+  constructor(public db: DbService, public modalController: ModalController, private alertCtrl: AlertController) { }
 
   ngOnInit() {
-    this.getLatestGymdata(this.activatedRoute.snapshot.paramMap.get('id'));
+    this.userId = this.db.userId;
+    this.getLatestGymdata(this.userId);
   }
 
   getLatestGymdata(id) {
@@ -80,14 +82,14 @@ export class AdditionalListPage implements OnInit {
   async addPackage() {
     const modal = await this.modalController.create({
       component: PopupAddPackagePage,
-      componentProps : {params : { type :'add', userId : this.activatedRoute.snapshot.paramMap.get('id')}},
+      componentProps : {params : { type :'add', userId : this.userId}},
       swipeToClose: true,
       presentingElement: await this.modalController.getTop() // Get the top-most ion-modal
     });
 
     modal.onDidDismiss().then((data) => {
       if (data.data === 'add') {
-        this.getLatestGymdata(this.activatedRoute.snapshot.paramMap.get('id'));
+        this.getLatestGymdata(this.userId);
       }
     })
 
@@ -98,7 +100,7 @@ export class AdditionalListPage implements OnInit {
     const modal = await this.modalController.create({
       component: PopupAddPackagePage,
       componentProps : {params : 
-        { type :'add', userId : this.activatedRoute.snapshot.paramMap.get('id'),
+        { type :'add', userId : this.userId ,
           action : 'update', updateData : data
         }},
       swipeToClose: true,
@@ -107,7 +109,7 @@ export class AdditionalListPage implements OnInit {
 
     modal.onDidDismiss().then((data) => {
       if (data.data === 'update') {
-        this.getLatestGymdata(this.activatedRoute.snapshot.paramMap.get('id'));
+        this.getLatestGymdata(this.userId);
       }
     })
 
@@ -116,7 +118,7 @@ export class AdditionalListPage implements OnInit {
 
   packdelete(pid) {
     return this.db.storage.executeSql('UPDATE adpackagedue SET isactive = 0 WHERE packageid = ?', [pid]).then(res => {
-      this.getLatestGymdata(this.activatedRoute.snapshot.paramMap.get('id'));
+      this.getLatestGymdata(this.userId);
     }, (err) => {
       alert(JSON.stringify(err));
     });

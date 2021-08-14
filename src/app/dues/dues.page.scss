@@ -1,0 +1,18 @@
+ion-tab-bar, ion-tab-button{
+    background: linear-gradient(
+        -180deg
+        , #383E4D 0%, #272A30 100%);
+   }
+   
+   ion-icon{
+     color: white !important;
+   }
+
+   ion-label {
+    color: white !important;
+   }
+
+ion-tab-button.tab-selected {
+    --background: black !important;
+    --color-selected: red;
+  }

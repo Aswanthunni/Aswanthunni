@@ -1,9 +1,9 @@
 <app-common-filter (newItemEvent)="getEvent($event)"></app-common-filter>
 <ion-content [fullscreen]="true">
-  <!-- <ion-searchbar
+  <ion-searchbar
     showcancelbutton=""
     (ionInput)="filterList($event)"
-  ></ion-searchbar> -->
+  ></ion-searchbar>
   <ion-list *ngIf="dueData.length">
 
     <ion-item *ngFor="let i of dueData">
@@ -12,12 +12,18 @@
       </ion-avatar>
       <ion-label style="margin-left: 1rem;">
         <h2>{{i.name}}</h2>
-        <p>Due in {{i.duedate}}</p>
+        <p>{{i.mobile}}</p>
+        <p style="color: red">Due in {{i.duedate}}</p>
       </ion-label>
+      <p item-right style="font-weight: bold;color: #4527A0;font-size: 1.3rem;">
+        {{i.daysCount}} Days
+      </p>
     </ion-item>
   
   </ion-list>
 
-  <ion-label *ngIf="!dueData.length">No Over Dues</ion-label>
+  <div style="display: flex;justify-content: center;align-items: center;font-weight: bold;margin-top: 3rem;"  *ngIf="!dueData.length">
+    No Over Dues Found
+  </div>
 
 </ion-content>

@@ -1,9 +1,10 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <div class="toolbar-background toolbar-background-ios"></div>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-menu-button style="color: white;"></ion-menu-button>
     </ion-buttons>
-    <ion-title>Backup</ion-title>
+    <ion-title style="color: white;font-weight: normal;">Backup</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -25,7 +26,7 @@
   <div>
     <ion-button type="submit" expand="block" (click)="export()" style="margin: 2rem;">backup</ion-button>
     <ion-label>
-      <p style="text-align: center;">Last Backup : 12/02/03</p>
+      <p style="text-align: center;">Last Backup : {{ lastLog.length ? lastLog[0].lastdate : '--/--/--'}}</p>
     </ion-label>
   </div>
 </ion-content>

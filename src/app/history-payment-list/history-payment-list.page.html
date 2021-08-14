@@ -1,9 +1,9 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Payment History</ion-title>
+    <div class="toolbar-background toolbar-background-ios"></div>
+    <ion-title style="color: white;font-weight: normal;">Payment History</ion-title>
   </ion-toolbar>
 </ion-header>
-
 <ion-content>
   <ion-grid class="ion-margin">
     <ion-row>
@@ -12,7 +12,7 @@
     </ion-row>
     <ion-row *ngFor="let i of history">
       <ion-col>{{i.paymentdate}}</ion-col>
-      <ion-col>{{i.totalpaid}}</ion-col>
+      <ion-col>₹{{i.totalpaid}}</ion-col>
     </ion-row>
   </ion-grid>
 </ion-content>

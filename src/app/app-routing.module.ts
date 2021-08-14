@@ -110,6 +110,22 @@ const routes: Routes = [
   {
     path: 'image-preview',
     loadChildren: () => import('./image-preview/image-preview.module').then( m => m.ImagePreviewPageModule)
+  },
+  {
+    path: 'login',
+    loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
+  },
+  {
+    path: 'admission-due',
+    loadChildren: () => import('./admission-due/admission-due.module').then( m => m.AdmissionDuePageModule)
+  },
+  {
+    path: 'admission-settle',
+    loadChildren: () => import('./admission-settle/admission-settle.module').then( m => m.AdmissionSettlePageModule)
+  },
+  {
+    path: 'admission-trans',
+    loadChildren: () => import('./admission-trans/admission-trans.module').then( m => m.AdmissionTransPageModule)
   }
 ];
 

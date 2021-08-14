@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DatePicker } from '@ionic-native/date-picker/ngx';
-import { NavParams } from '@ionic/angular';
+import { ModalController, NavParams } from '@ionic/angular';
 import { DbService } from '../db.service';
 
 @Component({
@@ -14,7 +14,7 @@ export class TransNewPage implements OnInit {
   createDate = '';
   params: any;
   customerForm: FormGroup;
-  constructor(private db: DbService, public navParams: NavParams, private fb: FormBuilder, private datePicker: DatePicker) { }
+  constructor(private db: DbService, public navParams: NavParams, private fb: FormBuilder, private datePicker: DatePicker, private viewCntrl: ModalController) { }
 
   ngOnInit() {
     this.params = this.navParams.get('params');
@@ -34,6 +34,7 @@ export class TransNewPage implements OnInit {
       Fees: ['', Validators.required],
       totalpaid: ['', Validators.required],
       balance: ['', Validators.required],
+      comments: ''
     });
 
     this.customerForm.controls.totalpaid.valueChanges.subscribe((value) => {
@@ -97,10 +98,10 @@ export class TransNewPage implements OnInit {
   updateGymDue() {
     let data = [this.params.id, this.customerForm.controls.package.value, this.customerForm.controls.totalpaid.value,
       this.customerForm.controls.balance.value, this.customerForm.controls.paydate.value,
-      this.customerForm.controls.duedate.value, this.createDate , 1]
-    return this.db.storage.executeSql('INSERT INTO gympackagedue (customerid, packageid, totalpaid, balance, paymentdate, duedate, createdate, isactive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', data)
+      this.customerForm.controls.duedate.value, this.createDate , this.customerForm.controls.comments.value, 1]
+    return this.db.storage.executeSql('INSERT INTO gympackagedue (customerid, packageid, totalpaid, balance, paymentdate, duedate, createdate, comments, isactive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
     .then(res => {
-      alert(res);
+      this.saveSuccess();
     },(err) => {
       alert(JSON.stringify(err));
     });
@@ -109,21 +110,38 @@ export class TransNewPage implements OnInit {
   updateAdDue() {
     let data = [this.params.id, this.customerForm.controls.package.value, this.customerForm.controls.totalpaid.value,
       this.customerForm.controls.balance.value, this.customerForm.controls.paydate.value,
-      this.customerForm.controls.duedate.value, this.createDate , 1]
-    return this.db.storage.executeSql('INSERT INTO adpackagedue (customerid, packageid, totalpaid, balance, paymentdate, duedate, createdate, isactive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', data)
+      this.customerForm.controls.duedate.value, this.createDate , this.customerForm.controls.comments.value, 1]
+    return this.db.storage.executeSql('INSERT INTO adpackagedue (customerid, packageid, totalpaid, balance, paymentdate, duedate, createdate, comments, isactive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
     .then(res => {
-      alert(res);
+      this.saveSuccess();
     },(err) => {
       alert(JSON.stringify(err));
     });
   }
 
   decideSave() {
+    if (this.customerForm.controls.duedate.value && this.customerForm.controls.paydate.value && new Date(this.customerForm.controls.duedate.value) < new Date(this.customerForm.controls.paydate.value)) {
+      alert('Due Date should be greater than Pay Date');
+      return false;
+    }
+    if (this.customerForm.controls.balance.value && +this.customerForm.controls.balance.value < 0 ) {
+      alert('No negative value for Balance');
+      return false;
+    }
     if (this.params.type === 'gym') {
       this.updateGymDue();
     } else if (this.params.type === 'add') {
       this.updateAdDue();
     }
+  }
+
+  closePop() {
+    this.viewCntrl.dismiss();
+  }
+
+  saveSuccess() {
+    alert('Transaction added successfully')
+    this.viewCntrl.dismiss('update');
   }
 
 }

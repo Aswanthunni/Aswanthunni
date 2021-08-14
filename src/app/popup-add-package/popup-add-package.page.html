@@ -1,15 +1,15 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>popup-add-package</ion-title>
+    <div class="toolbar-background toolbar-background-ios"></div>
+    <ion-title style="color: white;font-weight: normal;">Add Package</ion-title>
   </ion-toolbar>
 </ion-header>
-
 <ion-content>
   <form [formGroup]="customerForm">
     <ion-item lines="full">
       <ion-label>Package</ion-label>
       <ion-select placeholder="Select Package" formControlName="package" (ionChange)="packageChange()" *ngIf="package && package.length">
-        <ion-select-option [value]="i.id" *ngFor="let i of package">{{i.name}} ({{i.details}}) - {{i.fees}}</ion-select-option>
+        <ion-select-option [value]="i.id" *ngFor="let i of package">{{i.name}} ({{i.details}}) - ₹{{i.fees}}</ion-select-option>
       </ion-select>
 </ion-item>
 
@@ -28,16 +28,35 @@
   <ion-input type="number" formControlName="balance" [readonly]="true"></ion-input>
 </ion-item>
 
-<ion-row>
-<ion-item lines="full">
-  <ion-label position="floating">Payment Date</ion-label>
-  <ion-input type="text" formControlName="paydate" (click)="showCalender('paydate')" [readonly]="true"></ion-input>
+
+<ion-item>
+  <ion-label>Admission Fees Required ?</ion-label>
+  <ion-toggle [(ngModel)]="regReq" (ionChange)="toggle($event)" [ngModelOptions]="{standalone: true}"></ion-toggle>
 </ion-item>
 
-<ion-item lines="full">
-  <ion-label position="floating">Next Due Date</ion-label>
-  <ion-input type="text" formControlName="duedate" (click)="showCalender('duedate')" [readonly]="true"></ion-input>
+<ion-item lines="full" *ngIf="regReq">
+  <ion-label position="floating">Admission Fees</ion-label>
+  <ion-input type="number" formControlName="regfees"></ion-input>
 </ion-item>
+
+<ion-item lines="full" *ngIf="regReq">
+  <ion-label position="floating">Admission Fees Paid</ion-label>
+  <ion-input type="number" formControlName="regfeesPaid"></ion-input>
+</ion-item>
+
+<ion-row>
+  <ion-col>
+    <ion-item lines="full">
+      <ion-label position="floating">Payment Date</ion-label>
+      <ion-input type="text" formControlName="paydate" (click)="showCalender('paydate')" [readonly]="true"></ion-input>
+    </ion-item>
+  </ion-col>
+  <ion-col>
+    <ion-item lines="full">
+      <ion-label position="floating">Next Due Date</ion-label>
+      <ion-input type="text" formControlName="duedate" (click)="showCalender('duedate')" [readonly]="true"></ion-input>
+    </ion-item>
+  </ion-col>
 </ion-row>
 <ion-row>
   <ion-col>

@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ModalController, NavParams } from '@ionic/angular';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { BalanceSettlePopupPage } from '../balance-settle-popup/balance-settle-popup.page';
 import { DbService } from '../db.service';
 
@@ -8,19 +10,32 @@ import { DbService } from '../db.service';
   templateUrl: './balance-due-popup.page.html',
   styleUrls: ['./balance-due-popup.page.scss'],
 })
-export class BalanceDuePopupPage implements OnInit {
+export class BalanceDuePopupPage implements OnInit, OnDestroy {
   params: any;
   balanceArray = []
+  private ngUnsubscribe = new Subject();
   constructor(public navParams: NavParams, private db: DbService, private modalController : ModalController) { }
+  ngOnDestroy(): void {
+    this.db.balSettle.next('');
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+  }
 
   ngOnInit() {
     this.params = this.navParams.get('params');
     this.sumtotalbalAd();
+    this.db.returnbalSettle()
+    .pipe(takeUntil(this.ngUnsubscribe))
+    .subscribe((res) => {
+      if (res === 'updated') {
+        this.sumtotalbalAd();
+      }
+    });
   }
 
   sumtotalbalAd() {
     this.balanceArray = [];
-    return this.db.storage.executeSql('SELECT packageid, SUM(balance) as bal, name, createdate, duedate FROM adpackagedue INNER JOIN adpackagetable on adpackagetable.id = adpackagedue.packageid where customerid = ? GROUP BY packageid HAVING SUM(balance) > 0',[this.params.userId]).then(data => { 
+    return this.db.storage.executeSql('SELECT packageid, SUM(balance) as bal, name, details, createdate, duedate FROM adpackagedue INNER JOIN adpackagetable on adpackagetable.id = adpackagedue.packageid where customerid = ? GROUP BY packageid HAVING SUM(balance) > 0',[this.params.userId]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         item.type = 'ad';
@@ -33,7 +48,7 @@ export class BalanceDuePopupPage implements OnInit {
   }
 
   sumtotalbalGym() {
-    return this.db.storage.executeSql('SELECT packageid, SUM(balance) as bal, name, createdate, duedate  FROM gympackagedue INNER JOIN packagetable on packagetable.id = gympackagedue.packageid where customerid = ? GROUP BY packageid HAVING SUM(balance) > 0',[this.params.userId]).then(data => { 
+    return this.db.storage.executeSql('SELECT packageid, SUM(balance) as bal, name, details, createdate, duedate  FROM gympackagedue INNER JOIN packagetable on packagetable.id = gympackagedue.packageid where customerid = ? GROUP BY packageid HAVING SUM(balance) > 0',[this.params.userId]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         item.type = 'gym';
@@ -52,13 +67,6 @@ export class BalanceDuePopupPage implements OnInit {
       swipeToClose: true,
       presentingElement: await this.modalController.getTop() // Get the top-most ion-modal
     });
-
-    modal.onDidDismiss().then((data) => {
-      if (data.data === 'update') {
-        this.sumtotalbalAd();
-      }
-    })
-
     return await modal.present()
   }
 }

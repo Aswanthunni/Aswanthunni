@@ -10,6 +10,7 @@ export class OverDuePage implements OnInit {
 
   dueDataclone = [];
   dueData = [];
+  cloneArray = [];
   constructor(private db: DbService) { }
 
   ngOnInit() {
@@ -31,16 +32,19 @@ export class OverDuePage implements OnInit {
   createData() {
     this.dueData = [];
     this.dueDataclone.forEach((x) => {
-      if (this.calculateGap(x.duedate) < 0) {
-        x.daysCount = this.calculateGap(x.duedate);
+      let dueDay = this.calculateGap(x.duedate);
+      if (dueDay < 0) {
+        x.daysCount = dueDay;
         this.dueData.push(x);
       }
     })
+    this.dueData.sort((a, b) => new Date(b.duedate).getTime() - new Date(a.duedate).getTime());
+    this.cloneArray = this.dueData;
   }
 
   getGymData() {
     this.dueDataclone = [];
-    return this.db.storage.executeSql('SELECT name, duedate, img FROM gympackagedue INNER JOIN customertable ON customertable.id = gympackagedue.customerid and gympackagedue.id = (SELECT MAX(id) FROM gympackagedue where gympackagedue.customerid = customertable.id) and customertable.isactive = 1 and gympackagedue.isactive = 1',[]).then(data => { 
+    return this.db.storage.executeSql('SELECT name, duedate, img, mobile FROM gympackagedue INNER JOIN customertable ON customertable.id = gympackagedue.customerid and gympackagedue.id = (SELECT MAX(id) FROM gympackagedue where gympackagedue.customerid = customertable.id) and customertable.isactive = 1 and gympackagedue.isactive = 1',[]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.dueDataclone.push(item);
@@ -53,7 +57,7 @@ export class OverDuePage implements OnInit {
 
   getAddData() {
     this.dueDataclone = [];
-    return this.db.storage.executeSql('SELECT name, duedate, img FROM adpackagedue INNER JOIN customertable ON customertable.id = adpackagedue.customerid and adpackagedue.id IN (SELECT MAX(id) FROM adpackagedue where adpackagedue.customerid = customertable.id GROUP BY packageid) and customertable.isactive = 1 and adpackagedue.isactive = 1',[]).then(data => { 
+    return this.db.storage.executeSql('SELECT name, duedate, img, mobile FROM adpackagedue INNER JOIN customertable ON customertable.id = adpackagedue.customerid and adpackagedue.id IN (SELECT MAX(id) FROM adpackagedue where adpackagedue.customerid = customertable.id GROUP BY packageid) and customertable.isactive = 1 and adpackagedue.isactive = 1',[]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.dueDataclone.push(item);
@@ -70,5 +74,20 @@ export class OverDuePage implements OnInit {
     } else if (event === 'add') {
       this.getAddData();
     }
+  }
+
+  filterList(evt) {
+    const searchTerm = evt.srcElement.value;
+
+    if (!searchTerm) {
+      this.dueData = this.cloneArray;
+      return;
+    }
+  
+    this.dueData = this.cloneArray.filter(currentFood => {
+      if (currentFood.name && searchTerm) {
+        return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
+      }
+    });
   }
 }

@@ -1,9 +1,10 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <div class="toolbar-background toolbar-background-ios"></div>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-menu-button style="color: white;"></ion-menu-button>
     </ion-buttons>
-    <ion-title>Due</ion-title>
+    <ion-title style="color: white;font-weight: normal;">Due</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content>
@@ -12,17 +13,13 @@
       <ion-tab-button tab="upcoming-dues">
         <ion-icon name="calendar"></ion-icon>
         <ion-label>Upcoming Due</ion-label>
-        <ion-badge>6</ion-badge>
       </ion-tab-button>
   
   
       <ion-tab-button tab="over-due">
         <ion-icon name="information-circle"></ion-icon>
         <ion-label>Over Due</ion-label>
-        <ion-badge>6</ion-badge>
       </ion-tab-button>
     </ion-tab-bar>
   </ion-tabs>
-
-  <ion-label>Select Any tab to continue</ion-label>
 </ion-content>

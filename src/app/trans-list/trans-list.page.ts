@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, ModalController, NavParams } from '@ionic/angular';
 import { DbService } from '../db.service';
@@ -14,6 +14,7 @@ export class TransListPage implements OnInit {
   params: any;
   userId: any;
   defaultType = 'gym';
+  registerHistory = [];
   constructor(private db: DbService, public router: Router, public modalController: ModalController, private alertCtrl: AlertController) { }
 
   ngOnInit() {
@@ -26,7 +27,7 @@ export class TransListPage implements OnInit {
 
   getLatestAddata() {
     this.history = [];
-    return this.db.storage.executeSql('SELECT adpackagedue.id, customerid, packageid , totalpaid , balance , paymentdate , duedate , createdate, name, details, fees FROM adpackagedue INNER JOIN adpackagetable on adpackagetable.id = adpackagedue.packageid WHERE customerid = ? ',[this.userId]).then(data => { 
+    return this.db.storage.executeSql('SELECT adpackagedue.id, customerid, packageid , totalpaid , balance , paymentdate , duedate , createdate, name, details, fees, comments FROM adpackagedue INNER JOIN adpackagetable on adpackagetable.id = adpackagedue.packageid WHERE customerid = ? ',[this.userId]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.history.push(item);
@@ -39,7 +40,7 @@ export class TransListPage implements OnInit {
 
   getLatestGymdata() {
     this.history = [];
-    return this.db.storage.executeSql('SELECT gympackagedue.id, customerid, packageid , totalpaid , balance , paymentdate , duedate , createdate, name, details, fees FROM gympackagedue INNER JOIN packagetable on packagetable.id = gympackagedue.packageid WHERE customerid = ? ',[this.userId]).then(data => { 
+    return this.db.storage.executeSql('SELECT gympackagedue.id, customerid, packageid , totalpaid , balance , paymentdate , duedate , createdate, name, details, fees, comments FROM gympackagedue INNER JOIN packagetable on packagetable.id = gympackagedue.packageid WHERE customerid = ? ',[this.userId]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.history.push(item);
@@ -73,9 +74,9 @@ export class TransListPage implements OnInit {
     });
 
     modal.onDidDismiss().then((data) => {
-      // if (data.data === 'update') {
-      //   this.getLatestGymdata(this.activatedRoute.snapshot.paramMap.get('id'));
-      // }
+      if (data.data === 'update') {
+        this.getLatestGymdata();
+      }
     })
 
     return await modal.present()

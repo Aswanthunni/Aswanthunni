@@ -1,15 +1,15 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>New Transaction</ion-title>
+    <div class="toolbar-background toolbar-background-ios"></div>
+    <ion-title style="color: white;font-weight: normal;">New Transaction</ion-title>
   </ion-toolbar>
 </ion-header>
-
 <ion-content>
   <form [formGroup]="customerForm">
     <ion-item lines="full" >
       <ion-label>Package</ion-label>
       <ion-select placeholder="Select Package" formControlName="package" (ionChange)="packageChange()">
-        <ion-select-option [value]="i.packageid" *ngFor="let i of package">{{i.name}} ({{i.details}}) - {{i.fees}}</ion-select-option>
+        <ion-select-option [value]="i.packageid" *ngFor="let i of package">{{i.name}} ({{i.details}}) - ₹{{i.fees}}</ion-select-option>
       </ion-select>
 </ion-item>
 
@@ -38,6 +38,12 @@
   <ion-label position="floating">Next Due Date</ion-label>
   <ion-input type="text" formControlName="duedate" (click)="showCalender('duedate')" [readonly]="true"></ion-input>
 </ion-item>
+
+<ion-item lines="full">
+  <ion-label position="floating">Comments</ion-label>
+  <ion-input type="text" formControlName="comments"></ion-input>
+</ion-item>
+
 </ion-row>
   </form>
 

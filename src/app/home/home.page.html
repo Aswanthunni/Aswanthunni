@@ -1,23 +1,26 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <div class="toolbar-background toolbar-background-ios"></div>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-menu-button style="color: white;"></ion-menu-button>
     </ion-buttons>
-    <ion-title>{{ folder }} ff</ion-title>
+    <ion-title style="color: white;font-weight: normal;">New World Gym</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-      <ion-list>
-        <ion-item (click)="navigate('customer-mgmt')"><ion-label>Customer Management</ion-label></ion-item>
-        <ion-item (click)="navigate('/add-package')"><ion-label>Package</ion-label></ion-item>
-        <ion-item (click)="navigate('/additional-package')"><ion-label>Additional Package</ion-label></ion-item>
-        <ion-item (click)="navigate('/dues')"><ion-label>Dues</ion-label></ion-item>
-        <ion-item (click)="navigate('/history-customer-list/report')"><ion-label>Payment Report</ion-label></ion-item>
-        <ion-item (click)="navigate('/balance-due')"><ion-label>Balance Due</ion-label></ion-item>
-        <ion-item (click)="navigate('/history-customer-list/trans')"><ion-label>Transactions</ion-label></ion-item>
-        <ion-item (click)="navigate('/history-customer-list/due')"><ion-label>Due Extension</ion-label></ion-item>
-        <ion-item (click)="navigate('/dashboard')"><ion-label>Dashboard</ion-label></ion-item>
-        <ion-item (click)="navigate('/activate-customer')"><ion-label>Activate</ion-label></ion-item>
-      </ion-list>
+<ion-content [fullscreen]="true" class="home-content">
+        <ion-list class="home-list">
+          <ion-item (click)="navigate('/customer-mgmt')"><ion-label>Customer Management</ion-label></ion-item>
+          <ion-item (click)="navigate('/add-package')"><ion-label>Package</ion-label></ion-item>
+          <ion-item (click)="navigate('/additional-package')"><ion-label>Additional Package</ion-label></ion-item>
+          <ion-item (click)="navigate('/dues')"><ion-label>Dues</ion-label></ion-item>
+          <ion-item (click)="navigate('/history-customer-list/report')"><ion-label>Payment Report</ion-label></ion-item>
+          <ion-item (click)="navigate('/balance-due')"><ion-label>Due Settle</ion-label></ion-item>
+          <ion-item (click)="navigate('/history-customer-list/trans')"><ion-label>Transactions</ion-label></ion-item>
+          <ion-item (click)="navigate('/history-customer-list/due')"><ion-label>Due Extension</ion-label></ion-item>
+          <ion-item (click)="navigate('/dashboard')"><ion-label>Dashboard</ion-label></ion-item>
+          <ion-item (click)="navigate('/activate-customer')"><ion-label>Activate Customer</ion-label></ion-item>
+          <ion-item (click)="navigate('/admission-due')"><ion-label>Admission Due</ion-label></ion-item>
+          <ion-item (click)="navigate('/admission-trans')"><ion-label>Admission Transactions</ion-label></ion-item>
+        </ion-list>
 </ion-content>

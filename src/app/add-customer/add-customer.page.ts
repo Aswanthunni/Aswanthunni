@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Camera, CameraOptions } from '@ionic-native/Camera/ngx';
-import { ActionSheetController } from '@ionic/angular';
-import { Base64ToGallery } from '@ionic-native/base64-to-gallery/ngx';
+import { ActionSheetController, NavController } from '@ionic/angular';
 import { DatePicker } from '@ionic-native/date-picker/ngx';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DbService } from '../db.service';
@@ -36,11 +35,11 @@ export class AddCustomerPage implements OnInit {
   constructor(
     private camera: Camera,
     public actionSheetController: ActionSheetController,
-    private base64ToGallery: Base64ToGallery,
     private datePicker: DatePicker,
     private fb: FormBuilder,
     private db: DbService,
-    public router: Router
+    public router: Router,
+    private nav: NavController
   ) { }
 
   ngOnInit() {
@@ -65,7 +64,7 @@ export class AddCustomerPage implements OnInit {
       ])],
       dob: ['', Validators.required],
       age: ['', Validators.required],
-      mobile: ['', Validators.required],
+      mobile: ['', [Validators.required, Validators.pattern("^((\\+91-?)|0)?[0-9]{10}$")]],
       gender: ['', Validators.required],
       address1: ['', Validators.required],
       address2: '',
@@ -73,15 +72,16 @@ export class AddCustomerPage implements OnInit {
       adduedate: '',
       adpackage: '',
       adFees: '',
-      adtotalpaid: '',
-      adbalance: '',
+      adtotalpaid: ['', Validators.min(0)],
+      adbalance: ['', Validators.min(0)],
       gympaydate: '',
       gymduedate: '',
       gympackage: '',
       gymFees: '',
-      gymtotalpaid: '',
-      gymbalance: '',
-      regfees: ['', Validators.required],
+      gymtotalpaid: ['', Validators.min(0)],
+      gymbalance: ['', Validators.min(0)],
+      regfees: ['', [Validators.required, Validators.min(0)]],
+      regfeesPaid : ['', [Validators.required, Validators.min(0)]],
       height: ['', Validators.required],
       weight: ['', Validators.required]
     });
@@ -126,6 +126,7 @@ export class AddCustomerPage implements OnInit {
     this.customerForm.controls.height.setValue(res.height);
     this.customerForm.controls.weight.setValue(res.weight);
     this.customerForm.controls.regfees.setValue(res.regfees);
+    this.customerForm.controls.regfeesPaid.setValue(0);
     // this.customerForm.controls.gympackage.setValue(res.name);
     // this.customerForm.controls.adpackage.setValue(res.name);
     this.croppedImagepath = res.img;
@@ -133,15 +134,17 @@ export class AddCustomerPage implements OnInit {
 
   pickImage(sourceType) {
     const options: CameraOptions = {
-      quality: 100,
+      quality: 10,
       sourceType: sourceType,
       destinationType: this.camera.DestinationType.DATA_URL,
       encodingType: this.camera.EncodingType.JPEG,
       mediaType: this.camera.MediaType.PICTURE,
+      saveToPhotoAlbum : true
     }
     this.camera.getPicture(options).then((imageData) => {
       // imageData is either a base64 encoded string or a file URI
       this.croppedImagepath = 'data:image/jpeg;base64,' + imageData;
+      this.camera.cleanup();
     }, (err) => {
       // Handle error
     });
@@ -294,6 +297,24 @@ export class AddCustomerPage implements OnInit {
         alert('No negative value for Ad balance');
         return false;
       }
+
+
+      if (this.customerForm.controls.gymduedate.value && this.customerForm.controls.gympaydate.value && new Date(this.customerForm.controls.gymduedate.value) < new Date(this.customerForm.controls.gympaydate.value)) {
+        alert('Due Date should be greater than Pay Date');
+        return false;
+      }
+
+      if (this.customerForm.controls.adduedate.value && this.customerForm.controls.adpaydate.value && new Date(this.customerForm.controls.adduedate.value) < new Date(this.customerForm.controls.adpaydate.value)) {
+        alert('Due Date should be greater than Pay Date');
+        return false;
+      }
+
+      if (this.customerForm.controls.regfees.value && this.customerForm.controls.regfeesPaid.value && +this.customerForm.controls.regfeesPaid.value > +this.customerForm.controls.regfees.value ) {
+        alert('Admission Fees is less than Paid Fee');
+        return false;
+      }
+
+
       let joinDate = '';
       if (this.customerForm.controls.gympaydate.value) {
         joinDate = this.customerForm.controls.gympaydate.value
@@ -311,6 +332,8 @@ export class AddCustomerPage implements OnInit {
         this.croppedImagepath, 1];
       return this.db.storage.executeSql('INSERT INTO customertable (name, email, dob, age, mobile, gender, address1, address2, height, weight, regfees, gympackid, addpackid, createdate, img, isactive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
       .then(res => {
+        this.updateRegDue(res.insertId);
+
         if (this.addRequired) {
           this.updateAddDue(res.insertId)
         }
@@ -318,6 +341,7 @@ export class AddCustomerPage implements OnInit {
         if (this.gymRequired) {
           this.updateGymDue(res.insertId)
         }
+        this.emiEvent();
       }, (err) => {
         alert(JSON.stringify(err));
       });
@@ -326,10 +350,9 @@ export class AddCustomerPage implements OnInit {
     updateGymDue(id) {
       let data = [id, this.customerForm.controls.gympackage.value, this.customerForm.controls.gymtotalpaid.value,
         this.customerForm.controls.gymbalance.value, this.customerForm.controls.gympaydate.value,
-        this.customerForm.controls.gymduedate.value, this.customerForm.controls.gympaydate.value, 1]
-      return this.db.storage.executeSql('INSERT INTO gympackagedue (customerid, packageid, totalpaid, balance, paymentdate, duedate, createdate, isactive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', data)
+        this.customerForm.controls.gymduedate.value, this.customerForm.controls.gympaydate.value, 'Initial Payment' ,1]
+      return this.db.storage.executeSql('INSERT INTO gympackagedue (customerid, packageid, totalpaid, balance, paymentdate, duedate, createdate, comments, isactive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
       .then(res => {
-        alert(res);
       },(err) => {
         alert(JSON.stringify(err));
       });
@@ -338,11 +361,27 @@ export class AddCustomerPage implements OnInit {
     updateAddDue(id) {
       let data = [id, this.customerForm.controls.adpackage.value, this.customerForm.controls.adtotalpaid.value,
         this.customerForm.controls.adbalance.value, this.customerForm.controls.adpaydate.value,
-        this.customerForm.controls.adduedate.value, this.customerForm.controls.adpaydate.value, 1]
-      return this.db.storage.executeSql('INSERT INTO adpackagedue (customerid, packageid, totalpaid, balance, paymentdate, duedate, createdate, isactive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', data)
+        this.customerForm.controls.adduedate.value, this.customerForm.controls.adpaydate.value, 'Initial Payment', 1]
+      return this.db.storage.executeSql('INSERT INTO adpackagedue (customerid, packageid, totalpaid, balance, paymentdate, duedate, createdate, comments, isactive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
       .then(res => {
-        alert(res);
       }, (err) => {
+        alert(JSON.stringify(err));
+      });
+    }
+
+    updateRegDue(id) {
+      let joinDate = '';
+      const balance = +this.customerForm.controls.regfees.value - +this.customerForm.controls.regfeesPaid.value;
+      if (this.customerForm.controls.gympaydate.value) {
+        joinDate = this.customerForm.controls.gympaydate.value
+      } else if (this.customerForm.controls.adpaydate.value) {
+        joinDate = this.customerForm.controls.adpaydate.value
+      } 
+      let data = [id, this.customerForm.controls.regfees.value, this.customerForm.controls.regfeesPaid.value,
+        balance, joinDate, 'Initial Payment', 1]
+      return this.db.storage.executeSql('INSERT INTO regfeedue (customerid, fees, totalpaid, balance, paymentdate, comments, isactive) VALUES (?, ?, ?, ?, ?, ?, ?)', data)
+      .then(res => {
+      },(err) => {
         alert(JSON.stringify(err));
       });
     }
@@ -366,11 +405,24 @@ export class AddCustomerPage implements OnInit {
         this.customerForm.controls.regfees.value, this.croppedImagepath];
       return this.db.storage.executeSql(`UPDATE customertable set name = ?, email = ?, dob = ?, age = ?, mobile = ?, gender = ?, address1 = ?, address2 = ?, height = ?, weight = ?, regfees = ?, img = ? WHERE id = ${this.userId}` , data)
       .then(res => {
-        alert(JSON.stringify(res));
+        this.emiUpdateEvent();
       }, (err) => {
         alert(JSON.stringify(err));
       });
     }
 
+    emiEvent() {
+      setTimeout(() => {
+        alert('Customer Created Successfully');
+        this.db.customerCreate.next('created');
+        this.nav.pop();
+      }, 1000);
+    }
+
+    emiUpdateEvent() {
+        alert('Customer Updated Successfully');
+        this.db.customerCreate.next('created');
+        this.nav.pop();
+    }
 
   }

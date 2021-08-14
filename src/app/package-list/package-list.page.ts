@@ -14,15 +14,19 @@ export class PackageListPage implements OnInit {
   AllPackage = [];
   packageId = [];
   balanceArray = [];
-  constructor(private activatedRoute: ActivatedRoute, public db: DbService, public modalController: ModalController, private alertCtrl: AlertController) { }
+  userId;
+  constructor(public db: DbService, public modalController: ModalController, private alertCtrl: AlertController) { }
 
   ngOnInit() {
-    this.getLatestGymdata(this.activatedRoute.snapshot.paramMap.get('id'));
+    this.userId = this.db.userId
+    this.getLatestGymdata(this.userId);
   }
 
   getLatestGymdata(id) {
     this.fetchAllPackage = [];
     this.packageId = [];
+    this.packageId = [];
+    this.balanceArray = [];
     return this.db.storage.executeSql('SELECT * FROM gympackagedue WHERE id IN (SELECT MAX(id) FROM gympackagedue where customerid = ? GROUP BY packageid)',[id]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
@@ -83,7 +87,7 @@ export class PackageListPage implements OnInit {
   async addPackage() {
     const modal = await this.modalController.create({
       component: PopupAddPackagePage,
-      componentProps : {params : { type :'gym', userId : this.activatedRoute.snapshot.paramMap.get('id'),
+      componentProps : {params : { type :'gym', userId : this.userId,
       packageId : this.packageId
     }},
       swipeToClose: true,
@@ -92,7 +96,7 @@ export class PackageListPage implements OnInit {
 
     modal.onDidDismiss().then((data) => {
       if (data.data === 'add') {
-        this.getLatestGymdata(this.activatedRoute.snapshot.paramMap.get('id'));
+        this.getLatestGymdata(this.userId);
       }
     })
 
@@ -103,7 +107,7 @@ export class PackageListPage implements OnInit {
     const modal = await this.modalController.create({
       component: PopupAddPackagePage,
       componentProps : {params : 
-        { type :'gym', userId : this.activatedRoute.snapshot.paramMap.get('id'),
+        { type :'gym', userId : this.userId ,
           action : 'update', updateData : data
         }},
       swipeToClose: true,
@@ -112,7 +116,7 @@ export class PackageListPage implements OnInit {
 
     modal.onDidDismiss().then((data) => {
       if (data.data === 'update') {
-        this.getLatestGymdata(this.activatedRoute.snapshot.paramMap.get('id'));
+        this.getLatestGymdata(this.userId);
       }
     })
 
@@ -121,7 +125,7 @@ export class PackageListPage implements OnInit {
 
   packdelete(pid) {
     return this.db.storage.executeSql('UPDATE gympackagedue SET isactive = 0 WHERE packageid = ?', [pid]).then(res => {
-      this.getLatestGymdata(this.activatedRoute.snapshot.paramMap.get('id'));
+      this.getLatestGymdata(this.userId);
     }, (err) => {
       alert(JSON.stringify(err));
     });

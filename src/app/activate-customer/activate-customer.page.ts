@@ -49,6 +49,7 @@ export class ActivateCustomerPage implements OnInit {
 
     activateCustomer(id) {
       return this.db.storage.executeSql('UPDATE customertable set isactive = 1 where id = ?',[id]).then(data => { 
+        alert('Customer Activated Successfully');
         this.fetchPackage();
          },(err) => {
            alert(JSON.stringify(err));

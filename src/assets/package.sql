@@ -2,6 +2,8 @@ CREATE TABLE IF NOT EXISTS packagetable(id INTEGER PRIMARY KEY AUTOINCREMENT,nam
 
 CREATE TABLE IF NOT EXISTS adpackagetable(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT, details TEXT, fees TEXT, isactive TEXT);
 
+CREATE TABLE IF NOT EXISTS backup(id INTEGER PRIMARY KEY AUTOINCREMENT,lastdate TEXT);
+
 CREATE TABLE IF NOT EXISTS customertable (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 name TEXT,
@@ -31,6 +33,7 @@ balance TEXT,
 paymentdate TEXT, 
 duedate TEXT, 
 createdate TEXT,
+comments TEXT,
 isactive TEXT
 );
 
@@ -43,5 +46,17 @@ balance TEXT,
 paymentdate TEXT, 
 duedate TEXT, 
 createdate TEXT,
+comments TEXT,
+isactive TEXT
+);
+
+CREATE TABLE IF NOT EXISTS regfeedue (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+customerid INTEGER,
+fees TEXT,
+totalpaid TEXT,
+balance TEXT, 
+paymentdate TEXT,
+comments,
 isactive TEXT
 );

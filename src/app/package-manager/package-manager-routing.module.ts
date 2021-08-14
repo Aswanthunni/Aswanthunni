@@ -8,15 +8,15 @@ const routes: Routes = [
     path: '',
     component: PackageManagerPage,
     children : [{
-      path: 'package-list/:id',
+      path: 'package-list',
       loadChildren: () => import('../package-list/package-list.module').then(m => m.PackageListPageModule),
       pathMatch: 'full'
     },{
-      path: '/:id',
+      path: '',
       loadChildren: () => import('../package-list/package-list.module').then(m => m.PackageListPageModule),
       pathMatch: 'full'
     },{
-      path: 'additional-list/:id',
+      path: 'additional-list',
       loadChildren: () => import('../additional-list/additional-list.module').then(m => m.AdditionalListPageModule),
       pathMatch: 'full'
     }]

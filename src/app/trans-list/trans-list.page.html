@@ -1,9 +1,10 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <div class="toolbar-background toolbar-background-ios"></div>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-menu-button style="color: white;"></ion-menu-button>
     </ion-buttons>
-    <ion-title>Transactions</ion-title>
+    <ion-title style="color: white;font-weight: normal;">Transactions</ion-title>
   </ion-toolbar>
 </ion-header>
 <app-common-filter (newItemEvent)="getEvent($event)"></app-common-filter>
@@ -25,12 +26,13 @@
       <ion-item>
         <ion-label>
           <p>Plan : {{i.name}} ({{i.details}})</p>
-          <p>Amount : {{i.totalpaid}}</p>
+          <p>Amount : ₹{{i.totalpaid}}</p>
           <p>Paid Date : {{i.paymentdate}}</p>
+          <p>Comments : {{i.comments}}</p>
         </ion-label>
+        <ion-icon name="chevron-forward" item-right></ion-icon>
       </ion-item>
 
     </ion-item-sliding>
-  
   </ion-list>
 </ion-content>

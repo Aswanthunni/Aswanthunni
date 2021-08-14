@@ -50,19 +50,26 @@ export class AdditionalPackagePage implements OnInit {
         {
           text: type === 'add' ? 'Add' : 'Update',
           handler: res => {
-            // if (User.isValid(data.username, data.password)) {
-            //   // logged in!
-            // } else {
-            //   // invalid login
-            //   return false;
-            // }
-            res['id'] = data.id;
-            type === 'add' ? this.addPackage(res) : this.updatePackage(res);
+            if (this.isValid(res)) {
+              res['id'] = data.id;
+              type === 'add' ? this.addPackage(res) : this.updatePackage(res);
+            } else {
+              // invalid login
+              return false;
+            }
           }
         }
       ]
     });
     alert.present();
+  }
+
+  isValid(data) {
+    if (data.pkgname && data.pkgdetails && data.fees) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   addPackage(data) {

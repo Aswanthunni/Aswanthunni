@@ -1,20 +1,35 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
+import { Subject } from 'rxjs';
 import { BalanceDuePopupPage } from '../balance-due-popup/balance-due-popup.page';
 import { DbService } from '../db.service';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-balance-due',
   templateUrl: './balance-due.page.html',
   styleUrls: ['./balance-due.page.scss'],
 })
-export class BalanceDuePage implements OnInit {
+export class BalanceDuePage implements OnInit, OnDestroy {
   balanceArray = [];
   cloneArray = [];
+  private ngUnsubscribe = new Subject();
   constructor(public db: DbService, public modalController: ModalController) { }
+  ngOnDestroy(): void {
+    this.db.balSettle.next('');
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+  }
 
   ngOnInit() {
     this.sumtotalbalAd();
+    this.db.returnbalSettle()
+    .pipe(takeUntil(this.ngUnsubscribe))
+    .subscribe((res) => {
+      if (res === 'updated') {
+        this.sumtotalbalAd();
+      }
+    });
   }
 
   sumtotalbalAd() {

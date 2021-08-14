@@ -1,6 +1,6 @@
 import { AfterViewInit, Component } from '@angular/core';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { Platform } from '@ionic/angular';
+import { NavController, Platform } from '@ionic/angular';
 import { DbService } from './db.service';
 @Component({
   selector: 'app-root',
@@ -10,20 +10,22 @@ import { DbService } from './db.service';
 export class AppComponent {
   public appPages = [
     { title: 'Home', url: '/home/home', icon: 'home' },
-    { title: 'Customer', url: '/add-customer', icon: 'paper-plane' },
-    { title: 'Backup', url: '/backup', icon: 'paper-plane' },
+    { title: 'Customer', url: '/customer-mgmt', icon: 'person' },
+    { title: 'Dashboard', url: '/dashboard', icon: 'bar-chart' },
+    { title: 'Backup', url: '/backup', icon: 'cloud-upload' },
     // { title: 'Favorites', url: '/folder/Favorites', icon: 'heart' },
     // { title: 'Archived', url: '/folder/Archived', icon: 'archive' },
     // { title: 'Trash', url: '/folder/Trash', icon: 'trash' },
     // { title: 'Spam', url: '/folder/Spam', icon: 'warning' },
   ];
   public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
-  constructor(public db: DbService, private androidPermissions: AndroidPermissions, private platform: Platform) {
+  constructor(public db: DbService, private androidPermissions: AndroidPermissions, private platform: Platform, private nav: NavController) {
   }
   ngOnInit(): void {
     this.platform.ready().then(() => {
       if(this.platform.is('android')) {
         this.getPermission();
+        this.checkDate();
       }
   });
   }
@@ -44,5 +46,14 @@ export class AppComponent {
       }).catch((er) => {
         alert(JSON.stringify(er))
       });
+    }
+
+    checkDate() {
+      if (new Date() > new Date('24 Aug 2021')) {
+        alert('You are not authorized to use');
+        navigator['app'].exitApp();
+      } else {
+     //  this.nav.navigateRoot('/login');
+      }
     }
 }

@@ -1,28 +1,25 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <div class="toolbar-background toolbar-background-ios"></div>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-menu-button style="color: white;"></ion-menu-button>
     </ion-buttons>
-    <ion-title>Package Manager</ion-title>
+    <ion-title style="color: white;font-weight: normal;">Package Manager</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content>
   <ion-tabs>
     <ion-tab-bar slot="bottom">
-      <ion-tab-button tab="package-list/{{userId}}">
+      <ion-tab-button tab="package-list">
         <ion-icon name="calendar"></ion-icon>
         <ion-label>Gym Package</ion-label>
-        <ion-badge>6</ion-badge>
       </ion-tab-button>
   
   
-      <ion-tab-button tab="additional-list/{{userId}}">
+      <ion-tab-button tab="additional-list">
         <ion-icon name="information-circle"></ion-icon>
         <ion-label>Additional</ion-label>
-        <ion-badge>6</ion-badge>
       </ion-tab-button>
     </ion-tab-bar>
   </ion-tabs>
-
-  <ion-label>Select Any tab to continue</ion-label>
 </ion-content>

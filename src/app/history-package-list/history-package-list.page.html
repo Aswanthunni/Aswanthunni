@@ -1,10 +1,12 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <div class="toolbar-background toolbar-background-ios"></div>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-menu-button style="color: white;"></ion-menu-button>
     </ion-buttons>
-    <ion-title>Package List</ion-title>
+    <ion-title style="color: white;font-weight: normal;">Package List</ion-title>
   </ion-toolbar>
+</ion-header>
   <app-common-filter (newItemEvent)="getEvent($event)"></app-common-filter>
 <ion-content [fullscreen]="true">
   <ion-list>
@@ -28,11 +30,11 @@
         <ion-row>
           <ion-col>
             <p>Total Paid :</p>
-            <p>{{i.paid}}</p>
+            <p>₹{{i.paid}}</p>
           </ion-col>
           <ion-col>
            <p>Balance Amount :</p>
-           <p>{{i.balance}}</p>
+           <p>₹{{i.balance}}</p>
           </ion-col>
         </ion-row>
         <ion-row>
