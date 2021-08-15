@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, SecurityContext } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
+import { File } from '@ionic-native/file/ngx';
 import { DbService } from '../db.service';
 
 @Component({
@@ -11,7 +13,7 @@ export class OverDuePage implements OnInit {
   dueDataclone = [];
   dueData = [];
   cloneArray = [];
-  constructor(private db: DbService) { }
+  constructor(private db: DbService, private file: File, private dom: DomSanitizer) { }
 
   ngOnInit() {
     this.getGymData();
@@ -47,6 +49,7 @@ export class OverDuePage implements OnInit {
     return this.db.storage.executeSql('SELECT name, duedate, img, mobile FROM gympackagedue INNER JOIN customertable ON customertable.id = gympackagedue.customerid and gympackagedue.id = (SELECT MAX(id) FROM gympackagedue where gympackagedue.customerid = customertable.id) and customertable.isactive = 1 and gympackagedue.isactive = 1',[]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
+        this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', item.img, item);
         this.dueDataclone.push(item);
       }
       this.createData();
@@ -60,6 +63,7 @@ export class OverDuePage implements OnInit {
     return this.db.storage.executeSql('SELECT name, duedate, img, mobile FROM adpackagedue INNER JOIN customertable ON customertable.id = adpackagedue.customerid and adpackagedue.id IN (SELECT MAX(id) FROM adpackagedue where adpackagedue.customerid = customertable.id GROUP BY packageid) and customertable.isactive = 1 and adpackagedue.isactive = 1',[]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
+        this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', item.img, item);
         this.dueDataclone.push(item);
       }
       this.createData();
@@ -90,4 +94,14 @@ export class OverDuePage implements OnInit {
       }
     });
   }
+
+  getSanitizedImage(path, imageName, item){
+    this.file.readAsDataURL(path, imageName)
+    .then((data)=>{
+      item.img = this.dom.sanitize(SecurityContext.RESOURCE_URL, this.dom.bypassSecurityTrustResourceUrl(data));
+    })
+    .catch((err)=>{
+   //   alert(JSON.stringify(err));
+    });
+}
 }

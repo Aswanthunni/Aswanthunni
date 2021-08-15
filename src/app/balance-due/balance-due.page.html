@@ -6,26 +6,37 @@
     </ion-buttons>
     <ion-title style="color: white;font-weight: normal;">Balance Due</ion-title>
   </ion-toolbar>
+  <ion-searchbar style=" background-color: white !important;"
+  showcancelbutton=""
+  (ionInput)="filterList($event)"
+  ></ion-searchbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-searchbar
-    showcancelbutton=""
-    (ionInput)="filterList($event)"
-  ></ion-searchbar>
   <ion-list *ngIf="balanceArray.length">
-    <ion-item *ngFor="let i of balanceArray" (click)="openpopoup(i.id)">
+    <ion-virtual-scroll [items]="balanceArray" *ngIf="balanceArray.length" approxItemHeight="50px">
+    <ion-item *virtualItem="let item" (click)="openpopoup(item.id)">
       <ion-avatar style="margin: auto;">
-        <img  [src]="i.img">
+        <img  [src]="item.img">
       </ion-avatar>
       <ion-label style="margin-left: 1rem;">
-        <h2>{{i.name}}</h2>
-        <p>Total Balance : ₹{{i.bal}}</p>
+        <h2>{{item.name}}</h2>
+        <p>Total Balance : ₹{{item.bal}}</p>
       </ion-label>
-      <ion-icon name="cloud-done" item-right style="color: green;" *ngIf="i.active == 1"></ion-icon>
-      <ion-icon name="cloud-offline" item-right style="color: red;" *ngIf="i.active == 0 "></ion-icon>
+      <ion-icon name="cloud-done" item-right style="color: green;" *ngIf="item.active == 1"></ion-icon>
+      <ion-icon name="cloud-offline" item-right style="color: red;" *ngIf="item.active == 0 "></ion-icon>
     </ion-item>
-  
+  </ion-virtual-scroll>
   </ion-list>
+
+  <ion-infinite-scroll  (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+
+  <div style="display: flex;justify-content: center;align-items: center;font-weight: bold;margin-top: 3rem;"  *ngIf="!balanceArray.length">
+    No Dues Found
+  </div>
 
 </ion-content>

@@ -6,36 +6,41 @@
     </ion-buttons>
     <ion-title style="color: white;font-weight: normal;">Admission Due</ion-title>
   </ion-toolbar>
+  <ion-searchbar style=" background-color: white !important;"
+  showcancelbutton=""
+  (ionInput)="filterList($event)"
+  ></ion-searchbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-searchbar
-    showcancelbutton=""
-    (ionInput)="filterList($event)"
-  ></ion-searchbar>
-  <ion-list *ngIf="dueData.length">
-    <ion-item-sliding *ngFor="let i of dueData">
+  <ion-list>
+    <ion-virtual-scroll [items]="dueData" *ngIf="dueData.length" approxItemHeight="50px">
+      <ion-item-sliding *virtualItem="let item">
       <ion-item-options side="end">
-        <ion-item-option (click)="settle(i)">
+        <ion-item-option (click)="settle(item)">
           <ion-icon slot="icon-only" name="checkmark"></ion-icon>
         </ion-item-option> 
         </ion-item-options>
       <ion-item>
         <ion-avatar style="margin: auto;">
-          <img  [src]="i.img">
+          <img  [src]="item.img">
         </ion-avatar>
         <ion-label style="margin-left: 1rem;">
-          <h2>{{i.name}}</h2>
-          <p>{{i.mobile}}</p>
+          <h2>{{item.name}}</h2>
+          <p>{{item.mobile}}</p>
         </ion-label>
         <p item-right style="font-weight: bold;color: red;font-size: 1.3rem;">
-          ₹{{i.due}}
+          ₹{{item.due}}
         </p>
       </ion-item>
 
     </ion-item-sliding>  
+    </ion-virtual-scroll>
   </ion-list>
-
+  <ion-infinite-scroll  (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
   <div style="display: flex;justify-content: center;align-items: center;font-weight: bold;margin-top: 3rem;"  *ngIf="!dueData.length">
     No Admission Dues Found
   </div>

@@ -6,47 +6,52 @@
     </ion-buttons>
     <ion-title style="color: white;font-weight: normal;">Customer Management</ion-title>
   </ion-toolbar>
+  <ion-searchbar style=" background-color: white !important;"
+  showcancelbutton=""
+  (ionInput)="filterList($event)"
+  ></ion-searchbar>
 </ion-header>
-
 <ion-content [fullscreen]="true">
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="addCustomer()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
-
-  <ion-searchbar
-    showcancelbutton=""
-    (ionInput)="filterList($event)"
-  ></ion-searchbar>
   <ion-list>
-    <ion-item-sliding *ngFor="let i of customerData">
-      <ion-item-options side="end">
-        <ion-item-option (click)="navigateEdit(i.id)">
-          <ion-icon slot="icon-only" name="pencil"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="danger" (click)="presentAlertConfirm(i.id)">
-          <ion-icon slot="icon-only" name="trash"></ion-icon>
-        </ion-item-option>
-        <ion-item-option (click)="navigatePackage(i.id)" color="secondary">
-          <ion-icon slot="icon-only" name="barbell"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
+    <ion-virtual-scroll [items]="customerData" *ngIf="customerData.length" approxItemHeight="50px">
+      <ion-item-sliding *virtualItem="let item">
+        <ion-item-options side="end">
+          <ion-item-option (click)="navigateEdit(item.id)">
+            <ion-icon slot="icon-only" name="pencil"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="danger" (click)="presentAlertConfirm(item.id)">
+            <ion-icon slot="icon-only" name="trash"></ion-icon>
+          </ion-item-option>
+          <ion-item-option (click)="navigatePackage(item.id)" color="secondary">
+            <ion-icon slot="icon-only" name="barbell"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+    
+        <ion-item>
+          <ion-avatar style="margin: auto;" (click)="imagePreview(item.img)">
+            <img  [src]="item.img">
+          </ion-avatar>
+          <ion-label style="margin-left: 1rem;">
+            <h2>{{item.name}}</h2>
+            <p>{{item.mobile}}</p>
+          </ion-label>
+          <ion-icon name="chevron-forward" item-right></ion-icon>
+        </ion-item>
   
-      <ion-item>
-        <ion-avatar style="margin: auto;" (click)="imagePreview(i.img)">
-          <img  [src]="i.img">
-        </ion-avatar>
-        <ion-label style="margin-left: 1rem;">
-          <h2>{{i.name}}</h2>
-          <p>{{i.mobile}}</p>
-        </ion-label>
-        <ion-icon name="chevron-forward" item-right></ion-icon>
-      </ion-item>
-
-    </ion-item-sliding>
+      </ion-item-sliding>
+    </ion-virtual-scroll>
   
   </ion-list>
+
+  <ion-infinite-scroll  (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 
   <div style="display: flex;justify-content: center;align-items: center;font-weight: bold;margin-top: 3rem;"  *ngIf="!customerData.length">
     No Customer Found

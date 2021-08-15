@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { AlertController, IonInfiniteScroll, IonVirtualScroll } from '@ionic/angular';
 import { DbService } from '../db.service';
 
 @Component({
@@ -10,21 +10,42 @@ import { DbService } from '../db.service';
 export class AdmissionTransPage implements OnInit {
   dueData = [];
   cloneArray = [];
+  limit = 10;
+  offset = 0;
+  totalCustomer = 0;
+  @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
+  @ViewChild(IonVirtualScroll) virtualScroll: IonVirtualScroll;
   constructor(private db: DbService, private alertCtrl: AlertController) { }
 
   ngOnInit() {
-    this.getTrans();
+    this.getTransCount();
   }
 
-  getTrans() {
-    this.dueData = [];
-    return this.db.storage.executeSql('SELECT regfeedue.id as id, name, mobile, totalpaid, paymentdate, comments FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid',[]).then(data => { 
+  getTransCount() {
+    return this.db.storage.executeSql('SELECT COUNT(regfeedue.id) as count FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid',[]).then(data => { 
+      for (let i = 0; i < data.rows.length; i++) {
+        let item = data.rows.item(i);
+        this.totalCustomer = item.count;
+      }
+      this.getTrans(10, 0)
+    },(err) => {
+      alert(JSON.stringify(err));
+    });
+  }
+
+  getTrans(limit, offset) {
+    return this.db.storage.executeSql('SELECT regfeedue.id as id, name, mobile, totalpaid, paymentdate, comments FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid LIMIT ? OFFSET ?',[limit, offset]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.dueData.push(item);
       }
       this.dueData.sort((a, b) => new Date(b.paymentdate).getTime() - new Date(a.paymentdate).getTime());
       this.cloneArray = this.dueData;
+            //Hide Infinite List Loader on Complete
+            this.infiniteScroll.complete();
+
+            //Rerender Virtual Scroll List After Adding New Data
+            this.virtualScroll.checkEnd();
     },(err) => {
       alert(JSON.stringify(err));
     });
@@ -44,6 +65,30 @@ export class AdmissionTransPage implements OnInit {
         return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
       }
     });
+
+    if (!this.dueData.length && searchTerm && searchTerm.length > 4) {
+      this.searchinDB(searchTerm);
+    }
+  }
+
+  searchinDB(string) {
+    let a = [string+'%']
+    let b = [];
+    return this.db.storage.executeSql('SELECT regfeedue.id as id, name, mobile, totalpaid, paymentdate, comments FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid where name LIKE ?',a).then(data => { 
+      //  this.db.dismissLoader();
+           for (let i = 0; i < data.rows.length; i++) {
+             let item = data.rows.item(i);
+             b.push(item);
+           }
+           if (b.length) {
+            this.dueData = b;
+            this.infiniteScroll.complete();
+            this.virtualScroll.checkEnd();
+           }
+         },(err) => {
+           alert(JSON.stringify(err));
+       //  this.db.dismissLoader();
+         });
   }
 
   async delete(id) {
@@ -74,8 +119,25 @@ export class AdmissionTransPage implements OnInit {
   deleteAd(id) {
     return this.db.storage.executeSql('DELETE FROM regfeedue WHERE id = ?', [id])
     .then(_ => {
-      this.getTrans();
+      this.dueData = [];
+      this.getTrans(10, 0);
     });
+  }
+
+  loadData(event) {
+    this.offset = this.offset + 10;
+    // Using settimeout to simulate api call 
+    setTimeout(() => {
+
+      // load more data
+      this.getTrans(this.limit, this.offset)
+
+      // App logic to determine if all data is loaded
+      // and disable the infinite scroll
+      if (this.dueData.length == this.totalCustomer) {
+        event.target.disabled = true;
+      }
+    }, 500);
   }
 
 }

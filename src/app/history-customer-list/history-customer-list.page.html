@@ -6,28 +6,31 @@
     </ion-buttons>
     <ion-title style="color: white;font-weight: normal;">Customer List</ion-title>
   </ion-toolbar>
+<ion-searchbar style=" background-color: white !important;"
+showcancelbutton=""
+(ionInput)="filterList($event)"
+></ion-searchbar>
 </ion-header>
-<app-common-filter></app-common-filter>
 <ion-content [fullscreen]="true">
-  <ion-searchbar
-    showcancelbutton=""
-    (ionInput)="filterList($event)"
-  ></ion-searchbar>
   <ion-list *ngIf="custData.length">
-
-    <ion-item *ngFor="let i of custData" (click)="navigate(i.id)">
-      <ion-avatar style="margin: auto;">
-        <img  [src]="i.img">
-      </ion-avatar>
-      <ion-label style="margin-left: 1rem;">
-        <h2>{{i.name}}</h2>
-        <p>{{i.mobile}}</p>
-      </ion-label>
-      <ion-icon name="cloud-done" item-right style="color: green;" *ngIf="i.isactive == 1 && path !== 'due'"></ion-icon>
-      <ion-icon name="cloud-offline" item-right style="color: red;" *ngIf="i.isactive == 0 && path !== 'due'"></ion-icon>
-    </ion-item>
+    <ion-virtual-scroll [items]="custData" pproxItemHeight="50px">
+      <ion-item *virtualItem="let item" (click)="navigate(item.id)">
+        <ion-avatar style="margin: auto;">
+          <img  [src]="item.img">
+        </ion-avatar>
+        <ion-label style="margin-left: 1rem;">
+          <h2>{{item.name}}</h2>
+          <p>{{item.mobile}}</p>
+        </ion-label>
+        <ion-icon name="cloud-done" item-right style="color: green;" *ngIf="item.isactive == 1 && path !== 'due'"></ion-icon>
+        <ion-icon name="cloud-offline" item-right style="color: red;" *ngIf="item.isactive == 0 && path !== 'due'"></ion-icon>
+      </ion-item>
+    </ion-virtual-scroll>
   
   </ion-list>
-
+  <ion-infinite-scroll  (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 
 </ion-content>

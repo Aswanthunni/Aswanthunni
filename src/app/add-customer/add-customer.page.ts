@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, SecurityContext } from '@angular/core';
 import { Camera, CameraOptions } from '@ionic-native/Camera/ngx';
 import { ActionSheetController, NavController } from '@ionic/angular';
 import { DatePicker } from '@ionic-native/date-picker/ngx';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DbService } from '../db.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PhotoLibrary } from '@ionic-native/photo-library/ngx';
+import { File } from '@ionic-native/file/ngx';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-add-customer',
@@ -14,6 +17,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class AddCustomerPage implements OnInit {
 
   croppedImagepath = "assets/user.jpg";
+  imagePath = '';
   isLoading = false;
   addRequired = false;
   gymRequired = false;
@@ -39,7 +43,10 @@ export class AddCustomerPage implements OnInit {
     private fb: FormBuilder,
     private db: DbService,
     public router: Router,
-    private nav: NavController
+    private nav: NavController,
+    private photo: PhotoLibrary,
+    private file: File,
+    private dom: DomSanitizer
   ) { }
 
   ngOnInit() {
@@ -129,36 +136,47 @@ export class AddCustomerPage implements OnInit {
     this.customerForm.controls.regfeesPaid.setValue(0);
     // this.customerForm.controls.gympackage.setValue(res.name);
     // this.customerForm.controls.adpackage.setValue(res.name);
-    this.croppedImagepath = res.img;
+    this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', res.img);
+  //  this.croppedImagepath = res.img;
   }
 
   pickImage(sourceType) {
     const options: CameraOptions = {
-      quality: 10,
+      quality: 20,
       sourceType: sourceType,
-      destinationType: this.camera.DestinationType.DATA_URL,
+      destinationType: this.camera.DestinationType.FILE_URI,
       encodingType: this.camera.EncodingType.JPEG,
       mediaType: this.camera.MediaType.PICTURE,
       saveToPhotoAlbum : true
     }
     this.camera.getPicture(options).then((imageData) => {
-      // imageData is either a base64 encoded string or a file URI
-      this.croppedImagepath = 'data:image/jpeg;base64,' + imageData;
-      this.camera.cleanup();
+     this.photo.saveImage(imageData, 'Gym Album').then((res) => {
+    this.imagePath = res.fileName;
+     this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', res.fileName);
+     },
+     (err) => {
+      alert(JSON.stringify(err));
+     }
+     )
     }, (err) => {
       // Handle error
     });
   }
 
+  getSanitizedImage(path, imageName){
+    this.file.readAsDataURL(path, imageName)
+    .then((data)=>{
+      this.croppedImagepath = this.dom.sanitize(SecurityContext.RESOURCE_URL, this.dom.bypassSecurityTrustResourceUrl(data));
+    })
+    .catch((err)=>{
+  //    alert(JSON.stringify(err));
+    });
+}
+
   async selectImage() {
     const actionSheet = await this.actionSheetController.create({
       header: "Select Image source",
-      buttons: [{
-        text: 'Load from Library',
-        handler: () => {
-          this.pickImage(this.camera.PictureSourceType.PHOTOLIBRARY);
-        }
-      },
+      buttons: [
       {
         text: 'Use Camera',
         handler: () => {
@@ -329,7 +347,7 @@ export class AddCustomerPage implements OnInit {
         this.customerForm.controls.height.value, this.customerForm.controls.weight.value,
         this.customerForm.controls.regfees.value, this.customerForm.controls.gympackage.value,
         this.customerForm.controls.adpackage.value, joinDate,
-        this.croppedImagepath, 1];
+        this.imagePath, 1];
       return this.db.storage.executeSql('INSERT INTO customertable (name, email, dob, age, mobile, gender, address1, address2, height, weight, regfees, gympackid, addpackid, createdate, img, isactive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
       .then(res => {
         this.updateRegDue(res.insertId);
@@ -402,7 +420,7 @@ export class AddCustomerPage implements OnInit {
         this.customerForm.controls.mobile.value, this.customerForm.controls.gender.value,
         this.customerForm.controls.address1.value, this.customerForm.controls.address2.value,
         this.customerForm.controls.height.value, this.customerForm.controls.weight.value,
-        this.customerForm.controls.regfees.value, this.croppedImagepath];
+        this.customerForm.controls.regfees.value, this.imagePath];
       return this.db.storage.executeSql(`UPDATE customertable set name = ?, email = ?, dob = ?, age = ?, mobile = ?, gender = ?, address1 = ?, address2 = ?, height = ?, weight = ?, regfees = ?, img = ? WHERE id = ${this.userId}` , data)
       .then(res => {
         this.emiUpdateEvent();

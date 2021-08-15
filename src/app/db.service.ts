@@ -140,20 +140,32 @@ export class DbService {
   }
 
   replacedb(data) {
+    this.showLoader();
     this.sqlPorter.importSqlToDb(this.storage, data).then((res) => {
       alert('Data Restored Successfully');
+      this.dismissLoader();
     }).catch((err) => {
+      this.dismissLoader();
       alert(JSON.stringify(err))
     })
   }
 
   export() {
+    this.showLoader();
     const uni = new Date().valueOf();
+    try {
     this.sqlPorter.exportDbToSql(this.storage).then((res) => {
+      try {
       this.file.writeFile(this.file.externalRootDirectory + 'Download/', uni+'.sql', res).then((res) => {
         this.logbackup();
       }).catch(error => alert(JSON.stringify(error)));
+    } catch(er) {
+      alert(JSON.stringify(er));
+    }
     }).catch(error => alert(JSON.stringify(error)));
+  } catch(er) {
+    alert(JSON.stringify(er));
+  }
   }
 
   logbackup() {
@@ -161,6 +173,7 @@ export class DbService {
     const dFormat = dateTime.getDate()+" "+dateTime.toLocaleString('default', { month: 'short' })+" "+dateTime.getFullYear();
     return this.storage.executeSql('INSERT INTO backup (lastdate) VALUES (?)', [dFormat])
       .then(res => {
+        this.dismissLoader();
         alert('Database backup is successfull');
         this.backup.next('');
       });

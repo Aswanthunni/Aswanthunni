@@ -106,7 +106,7 @@ export class DashboardPage implements OnInit {
     this.dueData.forEach((x) => {
       if (this.calculateGap(x.duedate) < 0) {
           this.overdueCount++;
-      } else if (this.calculateGap(x.duedate) <= 10 && this.calculateGap(x.duedate) >= 0) {
+      } else if (this.calculateGap(x.duedate) <= 5 && this.calculateGap(x.duedate) >= 0) {
           this.updueCount++;
       }
     })

@@ -83,7 +83,7 @@ export class BackupPage implements OnInit {
     function placeFileContent(file) {
       readFileContent(file).then(content => {
         self.dbS.replacedb(content);
-      }).catch(error => console.log(error))
+      }).catch(error => alert(error))
     }
 
     function readFileContent(file) {

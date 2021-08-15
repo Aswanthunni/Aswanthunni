@@ -6,30 +6,37 @@
     </ion-buttons>
     <ion-title style="color: white;font-weight: normal;">Transactions</ion-title>
   </ion-toolbar>
-</ion-header>
-<ion-content>
-<ion-searchbar
+  <ion-searchbar style=" background-color: white !important;"
   showcancelbutton=""
   (ionInput)="filterList($event)"
-></ion-searchbar>
+  ></ion-searchbar>
+</ion-header>
+<ion-content>
   <ion-list>
-    <ion-item-sliding *ngFor="let i of dueData">
+    <ion-virtual-scroll [items]="dueData" *ngIf="dueData.length" approxItemHeight="50px">
+      <ion-item-sliding *virtualItem="let item">
       <ion-item-options side="end">
-        <ion-item-option color="danger" (click)="delete(i.id)">
+        <ion-item-option color="danger" (click)="delete(item.id)">
           <ion-icon slot="icon-only" name="trash"></ion-icon>
         </ion-item-option>
       </ion-item-options>
   
       <ion-item>
         <ion-label>
-          <p>Name : {{i.name}} ({{i.mobile}})</p>
-          <p>Amount : ₹{{i.totalpaid}}</p>
-          <p>Paid Date : {{i.paymentdate}}</p>
-          <p>Comments : {{i.comments}}</p>
+          <p>Name : {{item.name}} ({{item.mobile}})</p>
+          <p>Amount : ₹{{item.totalpaid}}</p>
+          <p>Paid Date : {{item.paymentdate}}</p>
+          <p>Comments : {{item.comments}}</p>
         </ion-label>
         <ion-icon name="chevron-forward" item-right></ion-icon>
       </ion-item>
 
     </ion-item-sliding>
+    </ion-virtual-scroll>
   </ion-list>
+
+  <ion-infinite-scroll  (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 </ion-content>
