@@ -33,6 +33,8 @@ export class CustomerMgmtPage implements OnInit, OnDestroy {
     })
   }
 
+  ionViewWillEnter() { window.dispatchEvent(new Event('resize')); }
+
   addCustomer() {
     this.nav.navigateForward('/add-customer')
   }
@@ -53,7 +55,7 @@ export class CustomerMgmtPage implements OnInit, OnDestroy {
  // this.db.showLoader();
   //  this.customerData = [];
   let data = [limit, offset];
-    return this.db.storage.executeSql('SELECT * FROM customertable where isactive = 1 LIMIT ? OFFSET ?',data).then(data => { 
+    return this.db.storage.executeSql('SELECT * FROM customertable where isactive = 1 ORDER BY name ASC LIMIT ? OFFSET ?',data).then(data => { 
  //  this.db.dismissLoader();
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
@@ -90,7 +92,7 @@ export class CustomerMgmtPage implements OnInit, OnDestroy {
   
     this.customerData = this.cloneArray.filter(currentFood => {
       if (currentFood.name && searchTerm) {
-        return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
+        return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1) || (currentFood.mobile.indexOf(searchTerm) > -1);
       }
     });
 
@@ -100,9 +102,9 @@ export class CustomerMgmtPage implements OnInit, OnDestroy {
   }
 
   searchinDB(string) {
-    let a = [string+'%']
+    let a = ['%'+string+'%', '%'+string+'%']
     let b = [];
-    return this.db.storage.executeSql('SELECT * FROM customertable where name LIKE ? and isactive = 1',a).then(data => { 
+    return this.db.storage.executeSql('SELECT * FROM customertable where (name LIKE ? or mobile like ?) and isactive = 1 ORDER BY name ASC',a).then(data => { 
       //  this.db.dismissLoader();
            for (let i = 0; i < data.rows.length; i++) {
              let item = data.rows.item(i);
@@ -222,5 +224,9 @@ export class CustomerMgmtPage implements OnInit, OnDestroy {
     this.infiniteScroll.disabled = !this.infiniteScroll.disabled;
   }
 
+
+  itemHeightFn(item, index) {
+    return 68;
+}
 
 }

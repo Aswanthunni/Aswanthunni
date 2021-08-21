@@ -8,6 +8,7 @@ import { OverDuePageRoutingModule } from './over-due-routing.module';
 
 import { OverDuePage } from './over-due.page';
 import { CommonFilterComponent } from '../common-filter/common-filter.component';
+import { ImagePreviewPageModule } from '../image-preview/image-preview.module';
 
 @NgModule({
   imports: [
@@ -16,7 +17,8 @@ import { CommonFilterComponent } from '../common-filter/common-filter.component'
     IonicModule,
     OverDuePageRoutingModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ImagePreviewPageModule
   ],
   declarations: [OverDuePage, CommonFilterComponent]
 })

@@ -13,20 +13,40 @@ showcancelbutton=""
 </ion-header>
 <ion-content [fullscreen]="true">
   <ion-list *ngIf="custData.length">
-    <ion-virtual-scroll [items]="custData" pproxItemHeight="50px">
-      <ion-item *virtualItem="let item" (click)="navigate(item.id)">
-        <ion-avatar style="margin: auto;">
-          <img  [src]="item.img">
-        </ion-avatar>
-        <ion-label style="margin-left: 1rem;">
-          <h2>{{item.name}}</h2>
-          <p>{{item.mobile}}</p>
-        </ion-label>
-        <ion-icon name="cloud-done" item-right style="color: green;" *ngIf="item.isactive == 1 && path !== 'due'"></ion-icon>
-        <ion-icon name="cloud-offline" item-right style="color: red;" *ngIf="item.isactive == 0 && path !== 'due'"></ion-icon>
-      </ion-item>
-    </ion-virtual-scroll>
+    <ion-virtual-scroll [items]="custData" approxItemHeight="68px" [itemHeight]="itemHeightFn">
+
+      <ion-item-sliding *virtualItem="let item">
+        <ion-item-options side="start">
+          <ion-item-option (click)="imagePreview(item.img)">
+            <ion-icon slot="icon-only" name="eye"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+    
+        <ion-item (click)="navigate(item.id)">
+          <ion-avatar style="margin: auto;">
+            <img  [src]="item.img">
+          </ion-avatar>
+          <ion-label style="margin-left: 1rem;">
+            <h2>{{item.name}}</h2>
+            <p>{{item.mobile}}</p>
+          </ion-label>
+          <ion-icon name="cloud-done" item-right style="color: green;" *ngIf="item.isactive == 1 && path !== 'due'"></ion-icon>
+          <ion-icon name="cloud-offline" item-right style="color: red;" *ngIf="item.isactive == 0 && path !== 'due'"></ion-icon>
+        </ion-item>
   
+      </ion-item-sliding>
+
+
+
+
+
+
+
+    </ion-virtual-scroll>
+    <ion-item lines="none" *ngIf="this.custData.length == this.totalCustomer" style="     display:block;
+    text-align: center;">
+      <ion-label><p style="font-weight: bold;">End of Results</p></ion-label>
+    </ion-item>
   </ion-list>
   <ion-infinite-scroll  (ionInfinite)="loadData($event)">
     <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data...">

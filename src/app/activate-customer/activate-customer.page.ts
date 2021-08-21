@@ -1,8 +1,9 @@
 import { Component, OnInit, Sanitizer, SecurityContext, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { File } from '@ionic-native/file/ngx';
-import { AlertController, IonInfiniteScroll, IonVirtualScroll } from '@ionic/angular';
+import { AlertController, IonInfiniteScroll, IonVirtualScroll, ModalController } from '@ionic/angular';
 import { DbService } from '../db.service';
+import { ImagePreviewPage } from '../image-preview/image-preview.page';
 
 @Component({
   selector: 'app-activate-customer',
@@ -17,11 +18,13 @@ export class ActivateCustomerPage implements OnInit {
   totalCustomer = 0;
   @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
   @ViewChild(IonVirtualScroll) virtualScroll: IonVirtualScroll;
-  constructor(private db: DbService, private alertCtrl: AlertController, private file: File, private dom: DomSanitizer) { }
+  constructor(private db: DbService, private alertCtrl: AlertController, private file: File, private dom: DomSanitizer, private modalController: ModalController) { }
 
   ngOnInit() {
     this.getTotalCustomer();
   }
+
+  ionViewWillEnter() { window.dispatchEvent(new Event('resize')); }
 
   getTotalCustomer() {
     return this.db.storage.executeSql('SELECT COUNT(id) as count FROM customertable where isactive = 0',[]).then(data => { 
@@ -36,7 +39,7 @@ export class ActivateCustomerPage implements OnInit {
   }
 
   fetchPackage(limit, offset) {
-      return this.db.storage.executeSql('SELECT * FROM customertable where isactive = 0 LIMIT ? OFFSET ?',[limit, offset]).then(data => { 
+      return this.db.storage.executeSql('SELECT * FROM customertable where isactive = 0 ORDER BY name ASC LIMIT ? OFFSET ?',[limit, offset]).then(data => { 
      //   this.db.dismissLoader();
         for (let i = 0; i < data.rows.length; i++) {
           let item = data.rows.item(i);
@@ -72,7 +75,7 @@ export class ActivateCustomerPage implements OnInit {
     
       this.customerData = this.cloneArray.filter(currentFood => {
         if (currentFood.name && searchTerm) {
-          return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
+          return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1) || (currentFood.mobile.indexOf(searchTerm) > -1);
         }
       });
 
@@ -82,9 +85,9 @@ export class ActivateCustomerPage implements OnInit {
     }
 
     searchinDB(string) {
-      let a = [string+'%']
+      let a = ['%'+string+'%', '%'+string+'%']
       let b = [];
-      return this.db.storage.executeSql('SELECT * FROM customertable where name LIKE ? and isactive = 0',a).then(data => { 
+      return this.db.storage.executeSql('SELECT * FROM customertable where (name LIKE ? or mobile LIKE ?) and isactive = 0 ORDER BY name ASC',a).then(data => { 
         //  this.db.dismissLoader();
              for (let i = 0; i < data.rows.length; i++) {
                let item = data.rows.item(i);
@@ -154,5 +157,24 @@ export class ActivateCustomerPage implements OnInit {
         }
       }, 500);
     }
+
+    async imagePreview(data) {
+      const modal = await this.modalController.create({
+        component: ImagePreviewPage,
+        componentProps : {params : data},
+        swipeToClose: true,
+        presentingElement: await this.modalController.getTop() // Get the top-most ion-modal
+      });
+  
+      modal.onDidDismiss().then((data) => {
+        
+      })
+  
+      return await modal.present()
+    }
+
+    itemHeightFn(item, index) {
+      return 68;
+  }
 
 }

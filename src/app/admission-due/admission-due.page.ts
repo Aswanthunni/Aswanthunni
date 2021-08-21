@@ -4,6 +4,7 @@ import { File } from '@ionic-native/file/ngx';
 import { IonInfiniteScroll, IonVirtualScroll, ModalController } from '@ionic/angular';
 import { AdmissionSettlePage } from '../admission-settle/admission-settle.page';
 import { DbService } from '../db.service';
+import { ImagePreviewPage } from '../image-preview/image-preview.page';
 
 @Component({
   selector: 'app-admission-due',
@@ -24,11 +25,13 @@ export class AdmissionDuePage implements OnInit {
     this.getGymDataCount();
   }
 
+  ionViewWillEnter() { window.dispatchEvent(new Event('resize')); }
+
   getGymDataCount() {
-    return this.db.storage.executeSql('SELECT COUNT(regfeedue.id) as count FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid GROUP BY regfeedue.customerid HAVING SUM(balance) > 0 ',[]).then(data => { 
+    return this.db.storage.executeSql('SELECT COUNT(regfeedue.customerid) as count FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid GROUP BY regfeedue.customerid HAVING SUM(balance) > 0 ',[]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
-        this.totalCustomer = item.count
+        this.totalCustomer += +item.count;
       }
       this.getGymData(10, 0)
     },(err) => {
@@ -37,7 +40,7 @@ export class AdmissionDuePage implements OnInit {
   }
 
   getGymData(limit, offset) {
-    return this.db.storage.executeSql('SELECT SUM(balance) as due, name, img, fees, mobile, customertable.id as userId FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid GROUP BY regfeedue.customerid HAVING SUM(balance) > 0 LIMIT ? OFFSET ?',[limit, offset]).then(data => { 
+    return this.db.storage.executeSql('SELECT SUM(balance) as due, name, img, fees, mobile, customertable.id as userId FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid GROUP BY regfeedue.customerid HAVING SUM(balance) > 0 ORDER BY name ASC LIMIT ? OFFSET ?',[limit, offset]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', item.img, item);
@@ -83,7 +86,7 @@ export class AdmissionDuePage implements OnInit {
   searchinDB(string) {
     let a = [string+'%']
     let b = [];
-    return this.db.storage.executeSql('SELECT SUM(balance) as due, name, img, fees, mobile, customertable.id as userId FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid where name LIKE ? GROUP BY regfeedue.customerid HAVING SUM(balance) > 0',a).then(data => { 
+    return this.db.storage.executeSql('SELECT SUM(balance) as due, name, img, fees, mobile, customertable.id as userId FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid where name LIKE ? GROUP BY regfeedue.customerid HAVING SUM(balance) > 0 ORDER BY name ASC',a).then(data => { 
       //  this.db.dismissLoader();
            for (let i = 0; i < data.rows.length; i++) {
              let item = data.rows.item(i);
@@ -134,5 +137,24 @@ export class AdmissionDuePage implements OnInit {
 
     return await modal.present();
   }
+
+  async imagePreview(data) {
+    const modal = await this.modalController.create({
+      component: ImagePreviewPage,
+      componentProps : {params : data},
+      swipeToClose: true,
+      presentingElement: await this.modalController.getTop() // Get the top-most ion-modal
+    });
+
+    modal.onDidDismiss().then((data) => {
+      
+    })
+
+    return await modal.present()
+  }
+
+  itemHeightFn(item, index) {
+    return 68;
+}
 
 }

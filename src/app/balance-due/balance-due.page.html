@@ -14,9 +14,9 @@
 
 <ion-content [fullscreen]="true">
   <ion-list *ngIf="balanceArray.length">
-    <ion-virtual-scroll [items]="balanceArray" *ngIf="balanceArray.length" approxItemHeight="50px">
+    <ion-virtual-scroll [items]="balanceArray" *ngIf="balanceArray.length" approxItemHeight="68px" [itemHeight]="itemHeightFn">
     <ion-item *virtualItem="let item" (click)="openpopoup(item.id)">
-      <ion-avatar style="margin: auto;">
+      <ion-avatar style="margin: auto;" (click)="imagePreview(item.img)">
         <img  [src]="item.img">
       </ion-avatar>
       <ion-label style="margin-left: 1rem;">
@@ -27,6 +27,10 @@
       <ion-icon name="cloud-offline" item-right style="color: red;" *ngIf="item.active == 0 "></ion-icon>
     </ion-item>
   </ion-virtual-scroll>
+  <ion-item lines="none" *ngIf="this.balanceArray.length == (this.adLimit + this.gymLimit)" style="     display:block;
+  text-align: center;">
+    <ion-label><p style="font-weight: bold;">End of Results</p></ion-label>
+  </ion-item>
   </ion-list>
 
   <ion-infinite-scroll  (ionInfinite)="loadData($event)">

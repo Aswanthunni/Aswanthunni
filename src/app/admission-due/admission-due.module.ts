@@ -8,6 +8,7 @@ import { AdmissionDuePageRoutingModule } from './admission-due-routing.module';
 
 import { AdmissionDuePage } from './admission-due.page';
 import { AdmissionSettlePageModule } from '../admission-settle/admission-settle.module';
+import { ImagePreviewPageModule } from '../image-preview/image-preview.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { AdmissionSettlePageModule } from '../admission-settle/admission-settle.
     FormsModule,
     IonicModule,
     AdmissionDuePageRoutingModule,
-    AdmissionSettlePageModule
+    AdmissionSettlePageModule,
+    ImagePreviewPageModule
   ],
   declarations: [AdmissionDuePage]
 })

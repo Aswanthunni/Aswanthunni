@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DatePicker } from '@ionic-native/date-picker/ngx';
 import { ModalController, NavParams } from '@ionic/angular';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { DbService } from '../db.service';
 
 @Component({
@@ -9,17 +11,23 @@ import { DbService } from '../db.service';
   templateUrl: './popup-add-package.page.html',
   styleUrls: ['./popup-add-package.page.scss'],
 })
-export class PopupAddPackagePage implements OnInit {
+export class PopupAddPackagePage implements OnInit, OnDestroy {
   customerForm: FormGroup;
   package = [];
   params: any;
   updateData: any;
   btntxt = '';
   regReq = false;
+  packMonth = 0;
+  private balUnSubscribe$ = new Subject();
   constructor(public viewCtrl: ModalController,
     private datePicker: DatePicker,
     private fb: FormBuilder,
     private db: DbService,public navParams: NavParams) { }
+  ngOnDestroy(): void {
+    this.balUnSubscribe$.next();
+    this.balUnSubscribe$.complete();
+  }
 
   ngOnInit() {
     this.params = this.navParams.get('params');
@@ -38,7 +46,9 @@ export class PopupAddPackagePage implements OnInit {
       regfeesPaid :''
     });
 
-    this.customerForm.controls.totalpaid.valueChanges.subscribe((value) => {
+    this.customerForm.controls.totalpaid.valueChanges
+    .pipe(takeUntil(this.balUnSubscribe$))
+    .subscribe((value) => {
       if (this.customerForm.controls.Fees.value) {
       const bal = +this.customerForm.controls.Fees.value - +value
       this.customerForm.controls.balance.setValue(bal);
@@ -79,6 +89,10 @@ export class PopupAddPackagePage implements OnInit {
   }
 
   showCalender(controls) {
+    let date = new Date()
+    if (this.customerForm.get(controls).value) {
+      date = new Date(this.customerForm.get(controls).value);
+    }
     this.datePicker.show({
       date: new Date(),
       mode: 'date',
@@ -87,6 +101,10 @@ export class PopupAddPackagePage implements OnInit {
       (dateTime) => {
         const dFormat = dateTime.getDate()+" "+dateTime.toLocaleString('default', { month: 'short' })+" "+dateTime.getFullYear();
         this.customerForm.get(controls).setValue(dFormat);
+        var d = new Date(dFormat);
+        d.setMonth(d.getMonth() + +this.packMonth);
+        const fl = d.getDate()+" "+d.toLocaleString('default', { month: 'short' })+" "+d.getFullYear();
+        this.customerForm.get('duedate').setValue(fl);
       },
       err => console.log('Error occurred while getting date: ', err)
     );
@@ -98,6 +116,7 @@ export class PopupAddPackagePage implements OnInit {
       const index = this.package.findIndex( i => i.id == id);
       if (index > -1) {
         this.customerForm.get('Fees').setValue(this.package[index].fees);
+        this.packMonth = this.package[index].month;
       }
     }
   }

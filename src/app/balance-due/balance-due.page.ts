@@ -6,6 +6,7 @@ import { DbService } from '../db.service';
 import { takeUntil } from 'rxjs/operators';
 import { File } from '@ionic-native/file/ngx';
 import { DomSanitizer } from '@angular/platform-browser';
+import { ImagePreviewPage } from '../image-preview/image-preview.page';
 
 @Component({
   selector: 'app-balance-due',
@@ -13,6 +14,7 @@ import { DomSanitizer } from '@angular/platform-browser';
   styleUrls: ['./balance-due.page.scss'],
 })
 export class BalanceDuePage implements OnInit, OnDestroy {
+  balanceArrayBackup = [];
   balanceArray = [];
   balanceArray2 = [];
   cloneArray = [];
@@ -40,14 +42,14 @@ export class BalanceDuePage implements OnInit, OnDestroy {
       }
     });
   }
-
+  
+  ionViewWillEnter() { window.dispatchEvent(new Event('resize')); }
 
   sumtotalbalAdCount() {
-    this.balanceArray = [];
     return this.db.storage.executeSql('SELECT COUNT(adpackagedue.customerid) as count FROM adpackagedue INNER JOIN customertable on customertable.id = adpackagedue.customerid GROUP BY customerid HAVING SUM(balance) > 0',[]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
-        this.adLimit = item.count;
+        this.adLimit += +item.count;
       }
       this.sumtotalbalGymCount();
     },(err) => {
@@ -59,7 +61,7 @@ export class BalanceDuePage implements OnInit, OnDestroy {
     return this.db.storage.executeSql('SELECT COUNT(gympackagedue.customerid) as count FROM gympackagedue INNER JOIN customertable on customertable.id = gympackagedue.customerid GROUP BY customerid HAVING SUM(balance) > 0',[]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
-        this.gymLimit = item.count;
+        this.gymLimit += +item.count;
       }
       this.sumtotalbalAd(10, 0);
     },(err) => {
@@ -69,10 +71,11 @@ export class BalanceDuePage implements OnInit, OnDestroy {
 
 
   sumtotalbalAd(limit, offset) {
-    return this.db.storage.executeSql('SELECT SUM(balance) as bal, name , customertable.id as id, img, customertable.isactive as active FROM adpackagedue INNER JOIN customertable on customertable.id = adpackagedue.customerid GROUP BY customerid HAVING SUM(balance) > 0 LIMIT ? OFFSET ?',[limit, offset]).then(data => { 
+    this.balanceArrayBackup = [];
+    return this.db.storage.executeSql('SELECT SUM(balance) as bal, name , mobile, customertable.id as id, img, customertable.isactive as active FROM adpackagedue INNER JOIN customertable on customertable.id = adpackagedue.customerid GROUP BY customerid HAVING SUM(balance) > 0 ORDER BY name ASC LIMIT ? OFFSET ?',[limit, offset]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
-        this.balanceArray.push(item);
+        this.balanceArrayBackup.push(item);
       }
       this.sumtotalbalGym(limit, offset);
     },(err) => {
@@ -81,10 +84,10 @@ export class BalanceDuePage implements OnInit, OnDestroy {
   }
 
   sumtotalbalGym(limit, offset) {
-    return this.db.storage.executeSql('SELECT SUM(balance) as bal, name , customertable.id as id, img, customertable.isactive as active FROM gympackagedue INNER JOIN customertable on customertable.id = gympackagedue.customerid GROUP BY customerid HAVING SUM(balance) > 0 LIMIT ? OFFSET ?',[limit, offset]).then(data => { 
+    return this.db.storage.executeSql('SELECT SUM(balance) as bal, name , mobile, customertable.id as id, img, customertable.isactive as active FROM gympackagedue INNER JOIN customertable on customertable.id = gympackagedue.customerid GROUP BY customerid HAVING SUM(balance) > 0 ORDER BY name ASC LIMIT ? OFFSET ?',[limit, offset]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
-        this.balanceArray.push(item);
+        this.balanceArrayBackup.push(item);
       }
       this.reduceArray();
     },(err) => {
@@ -93,7 +96,7 @@ export class BalanceDuePage implements OnInit, OnDestroy {
   }
 
   reduceArray() {
-    const mutate = this.balanceArray.reduce((obj, item) => {
+    const mutate = this.balanceArrayBackup.reduce((obj, item) => {
       obj[item.id] ? obj[item.id].bal = +obj[item.id].bal + +item.bal : (obj[item.id] = { ...item });
       return obj;
     }, {});
@@ -102,13 +105,16 @@ export class BalanceDuePage implements OnInit, OnDestroy {
   }
 
   splitArray(mutate) {
-    this.balanceArray = [];
+  let copyArray = [];
   for (let key in mutate) {
-    this.balanceArray.push(mutate[key])
+    copyArray.push(mutate[key])
   }
-  this.balanceArray.sort((a, b) => b.active - a.active || a.name.localeCompare(b.name));
-  this.balanceArray.forEach((item) => {
+  copyArray.forEach((item) => {
     this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', item.img, item);
+  })
+  copyArray.sort((a, b) => a.name.localeCompare(b.name));
+  copyArray.forEach((x) => {
+    this.balanceArray.push(x);
   })
   this.cloneArray = this.balanceArray;
         //Hide Infinite List Loader on Complete
@@ -128,7 +134,7 @@ export class BalanceDuePage implements OnInit, OnDestroy {
   
     this.balanceArray = this.cloneArray.filter(currentFood => {
       if (currentFood.name && searchTerm) {
-        return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
+        return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1) || (currentFood.mobile.indexOf(searchTerm) > -1);
       }
     });
     
@@ -144,7 +150,7 @@ export class BalanceDuePage implements OnInit, OnDestroy {
 
   sumtotalbalAdSearch(string) {
     this.balanceArray2 = [];
-    return this.db.storage.executeSql('SELECT SUM(balance) as bal, name , customertable.id as id, img, customertable.isactive as active FROM adpackagedue INNER JOIN customertable on customertable.id = adpackagedue.customerid where customertable.name LIKE ? GROUP BY customerid HAVING SUM(balance) > 0',[string]).then(data => { 
+    return this.db.storage.executeSql('SELECT SUM(balance) as bal, name , mobile, customertable.id as id, img, customertable.isactive as active FROM adpackagedue INNER JOIN customertable on customertable.id = adpackagedue.customerid where (name LIKE ? or mobile LIKE ?) GROUP BY customerid HAVING SUM(balance) > 0 ORDER BY name ASC',[string, string]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.balanceArray2.push(item);
@@ -156,7 +162,7 @@ export class BalanceDuePage implements OnInit, OnDestroy {
   }
 
   sumtotalbalGymSearch(string) {
-    return this.db.storage.executeSql('SELECT SUM(balance) as bal, name , customertable.id as id, img, customertable.isactive as active FROM gympackagedue INNER JOIN customertable on customertable.id = gympackagedue.customerid where name LIKE ? GROUP BY customerid HAVING SUM(balance) > 0',[string]).then(data => { 
+    return this.db.storage.executeSql('SELECT SUM(balance) as bal, name , mobile, customertable.id as id, img, customertable.isactive as active FROM gympackagedue INNER JOIN customertable on customertable.id = gympackagedue.customerid where (name LIKE ? or mobile LIKE ?) GROUP BY customerid HAVING SUM(balance) > 0 ORDER BY name ASC',[string, string]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.balanceArray2.push(item);
@@ -235,6 +241,25 @@ export class BalanceDuePage implements OnInit, OnDestroy {
     .catch((err)=>{
   //    alert(JSON.stringify(err));
     });
+}
+
+async imagePreview(data) {
+  const modal = await this.modalController.create({
+    component: ImagePreviewPage,
+    componentProps : {params : data},
+    swipeToClose: true,
+    presentingElement: await this.modalController.getTop() // Get the top-most ion-modal
+  });
+
+  modal.onDidDismiss().then((data) => {
+    
+  })
+
+  return await modal.present()
+}
+
+itemHeightFn(item, index) {
+  return 68;
 }
 
 }

@@ -31,6 +31,8 @@ export class TransListPage implements OnInit {
     }
   }
 
+  ionViewWillEnter() { window.dispatchEvent(new Event('resize')); }
+
   getLatestAddata(limit, offset) {
     return this.db.storage.executeSql('SELECT adpackagedue.id, customerid, packageid , totalpaid , balance , paymentdate , duedate , createdate, name, details, fees, comments FROM adpackagedue INNER JOIN adpackagetable on adpackagetable.id = adpackagedue.packageid WHERE customerid = ? LIMIT ? OFFSET ?',[this.userId, limit, offset]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
@@ -195,6 +197,10 @@ export class TransListPage implements OnInit {
       }
     }, 500);
   }
+
+  itemHeightFn(item, index) {
+    return 115;
+}
 
 
 }

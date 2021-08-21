@@ -14,7 +14,7 @@ export class PackageListPage implements OnInit {
   AllPackage = [];
   packageId = [];
   balanceArray = [];
-  userId;
+  userId: any;
   constructor(public db: DbService, public modalController: ModalController, private alertCtrl: AlertController) { }
 
   ngOnInit() {

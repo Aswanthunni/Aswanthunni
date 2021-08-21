@@ -2,8 +2,9 @@ import { Component, OnInit, SecurityContext, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { File } from '@ionic-native/file/ngx';
-import { IonInfiniteScroll, IonVirtualScroll, NavController } from '@ionic/angular';
+import { IonInfiniteScroll, IonVirtualScroll, ModalController, NavController } from '@ionic/angular';
 import { DbService } from '../db.service';
+import { ImagePreviewPage } from '../image-preview/image-preview.page';
 
 @Component({
   selector: 'app-history-customer-list',
@@ -19,7 +20,7 @@ export class HistoryCustomerListPage implements OnInit {
   totalCustomer = 0;
   @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
   @ViewChild(IonVirtualScroll) virtualScroll: IonVirtualScroll;
-  constructor(private db: DbService, private nav: NavController, private activatedRoute: ActivatedRoute, private file: File, private dom: DomSanitizer) { }
+  constructor(private db: DbService, private nav: NavController, private activatedRoute: ActivatedRoute, private file: File, private dom: DomSanitizer, private modalController: ModalController) { }
 
   ngOnInit() {
     this.path = this.activatedRoute.snapshot.paramMap.get('id');
@@ -30,10 +31,12 @@ export class HistoryCustomerListPage implements OnInit {
     }
   }
 
+  ionViewWillEnter() { window.dispatchEvent(new Event('resize')); }
+
   fetchPackage(limit, offset) {
     //  this.db.showLoader();
       let data = [limit, offset];
-      return this.db.storage.executeSql('SELECT * FROM customertable LIMIT ? OFFSET ?',data).then(data => { 
+      return this.db.storage.executeSql('SELECT * FROM customertable ORDER BY name ASC LIMIT ? OFFSET ?',data).then(data => { 
      //   this.db.dismissLoader();
         for (let i = 0; i < data.rows.length; i++) {
           let item = data.rows.item(i);
@@ -57,7 +60,7 @@ export class HistoryCustomerListPage implements OnInit {
     fetchPackagedue(limit, offset) {
       //  this.db.showLoader();
         let data = [limit, offset];
-        return this.db.storage.executeSql('SELECT * FROM customertable where isactive = 1 LIMIT ? OFFSET ?', data).then(data => { 
+        return this.db.storage.executeSql('SELECT * FROM customertable where isactive = 1 ORDER BY name ASC LIMIT ? OFFSET ?', data).then(data => { 
        //   this.db.dismissLoader();
           for (let i = 0; i < data.rows.length; i++) {
             let item = data.rows.item(i);
@@ -110,7 +113,7 @@ export class HistoryCustomerListPage implements OnInit {
     
       this.custData = this.cloneArray.filter(currentFood => {
         if (currentFood.name && searchTerm) {
-          return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
+          return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1) || (currentFood.mobile.indexOf(searchTerm) > -1);
         }
       });
 
@@ -121,9 +124,9 @@ export class HistoryCustomerListPage implements OnInit {
       }
     }
     searchinDB(string) {
-      let a = [string+'%']
+      let a = ['%'+string+'%', '%'+string+'%']
       let b = [];
-      return this.db.storage.executeSql('SELECT * FROM customertable where name LIKE ? and isactive = 1',a).then(data => { 
+      return this.db.storage.executeSql('SELECT * FROM customertable where (name LIKE ? or mobile LIKE ?) and isactive = 1 ORDER BY name ASC',a).then(data => { 
         //  this.db.dismissLoader();
              for (let i = 0; i < data.rows.length; i++) {
                let item = data.rows.item(i);
@@ -145,9 +148,9 @@ export class HistoryCustomerListPage implements OnInit {
     }
 
     searchinDBDue(string) {
-      let a = ['%'+string]
+      let a = ['%'+string+'%', '%'+string+'%']
       let b = [];
-      return this.db.storage.executeSql('SELECT * FROM customertable where name LIKE ?',a).then(data => { 
+      return this.db.storage.executeSql('SELECT * FROM customertable where name (name LIKE ? or mobile LIKE ?) ORDER BY name ASC',a).then(data => { 
         //  this.db.dismissLoader();
              for (let i = 0; i < data.rows.length; i++) {
                let item = data.rows.item(i);
@@ -206,6 +209,25 @@ export class HistoryCustomerListPage implements OnInit {
       //  alert(JSON.stringify(err));
       });
   }
+
+  async imagePreview(data) {
+    const modal = await this.modalController.create({
+      component: ImagePreviewPage,
+      componentProps : {params : data},
+      swipeToClose: true,
+      presentingElement: await this.modalController.getTop() // Get the top-most ion-modal
+    });
+
+    modal.onDidDismiss().then((data) => {
+      
+    })
+
+    return await modal.present()
+  }
+
+  itemHeightFn(item, index) {
+    return 68;
+}
   
 
 }

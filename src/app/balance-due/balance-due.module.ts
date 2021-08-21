@@ -8,6 +8,7 @@ import { BalanceDuePageRoutingModule } from './balance-due-routing.module';
 
 import { BalanceDuePage } from './balance-due.page';
 import { BalanceDuePopupPageModule } from '../balance-due-popup/balance-due-popup.module';
+import { ImagePreviewPageModule } from '../image-preview/image-preview.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { BalanceDuePopupPageModule } from '../balance-due-popup/balance-due-popu
     FormsModule,
     IonicModule,
     BalanceDuePageRoutingModule,
-    BalanceDuePopupPageModule
+    BalanceDuePopupPageModule,
+    ImagePreviewPageModule
   ],
   declarations: [BalanceDuePage]
 })

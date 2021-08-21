@@ -1,7 +1,9 @@
 import { Component, OnInit, SecurityContext } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { File } from '@ionic-native/file/ngx';
+import { ModalController } from '@ionic/angular';
 import { DbService } from '../db.service';
+import { ImagePreviewPage } from '../image-preview/image-preview.page';
 
 @Component({
   selector: 'app-over-due',
@@ -13,7 +15,7 @@ export class OverDuePage implements OnInit {
   dueDataclone = [];
   dueData = [];
   cloneArray = [];
-  constructor(private db: DbService, private file: File, private dom: DomSanitizer) { }
+  constructor(private db: DbService, private file: File, private dom: DomSanitizer, private modalController: ModalController) { }
 
   ngOnInit() {
     this.getGymData();
@@ -90,7 +92,7 @@ export class OverDuePage implements OnInit {
   
     this.dueData = this.cloneArray.filter(currentFood => {
       if (currentFood.name && searchTerm) {
-        return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
+        return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1) || (currentFood.mobile.indexOf(searchTerm) > -1);
       }
     });
   }
@@ -104,4 +106,21 @@ export class OverDuePage implements OnInit {
    //   alert(JSON.stringify(err));
     });
 }
+
+async imagePreview(data) {
+  const modal = await this.modalController.create({
+    component: ImagePreviewPage,
+    componentProps : {params : data},
+    swipeToClose: true,
+    presentingElement: await this.modalController.getTop() // Get the top-most ion-modal
+  });
+
+  modal.onDidDismiss().then((data) => {
+    
+  })
+
+  return await modal.present()
+}
+
+
 }

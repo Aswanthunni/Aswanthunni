@@ -13,6 +13,7 @@ export class TransNewPage implements OnInit {
   package = [];
   createDate = '';
   params: any;
+  packMonth = 0;
   customerForm: FormGroup;
   constructor(private db: DbService, public navParams: NavParams, private fb: FormBuilder, private datePicker: DatePicker, private viewCntrl: ModalController) { }
 
@@ -47,7 +48,7 @@ export class TransNewPage implements OnInit {
 
   getLatestGymdata(id) {
     this.package = [];
-    return this.db.storage.executeSql('SELECT packageid, name, fees, details, createdate FROM gympackagedue INNER JOIN packagetable on packagetable.id = gympackagedue.packageid WHERE gympackagedue.id IN (SELECT MAX(id) FROM gympackagedue where customerid = ? GROUP BY packageid) and gympackagedue.isactive = 1',[id]).then(data => { 
+    return this.db.storage.executeSql('SELECT packageid, name, fees, details, createdate, month FROM gympackagedue INNER JOIN packagetable on packagetable.id = gympackagedue.packageid WHERE gympackagedue.id IN (SELECT MAX(id) FROM gympackagedue where customerid = ? GROUP BY packageid) and gympackagedue.isactive = 1',[id]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.package.push(item);
@@ -59,7 +60,7 @@ export class TransNewPage implements OnInit {
 
   getLatestAdata(id) {
     this.package = [];
-    return this.db.storage.executeSql('SELECT packageid, name, fees, details, createdate FROM adpackagedue INNER JOIN adpackagetable on adpackagetable.id = adpackagedue.packageid WHERE adpackagedue.id IN (SELECT MAX(id) FROM adpackagedue where customerid = ? GROUP BY packageid) and adpackagedue.isactive = 1',[id]).then(data => { 
+    return this.db.storage.executeSql('SELECT packageid, name, fees, details, createdate, month FROM adpackagedue INNER JOIN adpackagetable on adpackagetable.id = adpackagedue.packageid WHERE adpackagedue.id IN (SELECT MAX(id) FROM adpackagedue where customerid = ? GROUP BY packageid) and adpackagedue.isactive = 1',[id]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.package.push(item);
@@ -75,6 +76,7 @@ export class TransNewPage implements OnInit {
       const index = this.package.findIndex( i => i.packageid == id);
       if (index > -1) {
         this.customerForm.get('Fees').setValue(this.package[index].fees);
+        this.packMonth = this.package[index].month;
         this.createDate = this.package[index].createdate;
       }
     }
@@ -82,6 +84,10 @@ export class TransNewPage implements OnInit {
 
 
   showCalender(controls) {
+    let date = new Date()
+    if (this.customerForm.get(controls).value) {
+      date = new Date(this.customerForm.get(controls).value);
+    }
     this.datePicker.show({
       date: new Date(),
       mode: 'date',
@@ -90,6 +96,10 @@ export class TransNewPage implements OnInit {
       (dateTime) => {
         const dFormat = dateTime.getDate()+" "+dateTime.toLocaleString('default', { month: 'short' })+" "+dateTime.getFullYear();
         this.customerForm.get(controls).setValue(dFormat);
+        var d = new Date(dFormat);
+        d.setMonth(d.getMonth() + +this.packMonth);
+        const fl = d.getDate()+" "+d.toLocaleString('default', { month: 'short' })+" "+d.getFullYear();
+        this.customerForm.get('duedate').setValue(fl);
       },
       err => console.log('Error occurred while getting date: ', err)
     );

@@ -15,7 +15,7 @@ export class AdditionalPackagePage implements OnInit {
     this.fetchPackage();
   }
 
-  async presentPrompt(data = { name : '', details: '', fees: '', id: ''}, type = 'add') {
+  async presentPrompt(data = { name : '', details: '', fees: '', month: '', id: ''}, type = 'add') {
     const alert = await this.alertCtrl.create({
       header: 'Add Package',
       backdropDismiss : false,
@@ -31,6 +31,12 @@ export class AdditionalPackagePage implements OnInit {
           placeholder: 'Package Details',
           type: 'text',
           value: data.details
+        },
+        {
+          name: 'month',
+          placeholder: 'Package Duration (In Months)',
+          type: 'number',
+          value: data.month
         },
         {
           name: 'fees',
@@ -73,8 +79,8 @@ export class AdditionalPackagePage implements OnInit {
   }
 
   addPackage(data) {
-    let data2 = [data.pkgname, data.pkgdetails, data.fees, 1];
-    return this.db.storage.executeSql('INSERT INTO adpackagetable (name, details, fees, isactive) VALUES (?, ?, ?, ?)', data2)
+    let data2 = [data.pkgname, data.pkgdetails, data.fees, data.month, 1];
+    return this.db.storage.executeSql('INSERT INTO adpackagetable (name, details, fees, month, isactive) VALUES (?, ?, ?, ?, ?)', data2)
     .then(res => {
       if (res) {
         this.fetchPackage();
@@ -85,8 +91,8 @@ export class AdditionalPackagePage implements OnInit {
   }
 
   updatePackage(data) {
-    let data2 = [data.pkgname, data.pkgdetails, data.fees];
-    return this.db.storage.executeSql(`UPDATE adpackagetable SET name = ?, details = ?, fees = ? WHERE id = ${data.id}`, data2)
+    let data2 = [data.pkgname, data.pkgdetails, data.fees, data.month];
+    return this.db.storage.executeSql(`UPDATE adpackagetable SET name = ?, details = ?, fees = ?, month = ? WHERE id = ${data.id}`, data2)
     .then(res => {
       if (res) {
         this.fetchPackage();
@@ -109,7 +115,7 @@ export class AdditionalPackagePage implements OnInit {
   }
 
   edit(data) {
-    this.presentPrompt({ name : data.name, details: data.details, fees: data.fees, id: data.id}, 'update')
+    this.presentPrompt({ name : data.name, details: data.details, fees: data.fees, month: data.month, id: data.id}, 'update')
   }
 
   deletePack(id) {

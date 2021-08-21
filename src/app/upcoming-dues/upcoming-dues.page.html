@@ -7,7 +7,7 @@
   <ion-list *ngIf="dueData.length">
 
     <ion-item *ngFor="let i of dueData">
-      <ion-avatar style="margin: auto;">
+      <ion-avatar style="margin: auto;" (click)="imagePreview(i.img)">
         <img  [src]="i.img">
       </ion-avatar>
       <ion-label style="margin-left: 1rem;">

@@ -29,22 +29,26 @@
 </ion-item>
 
 <ion-row>
-<ion-item lines="full">
-  <ion-label position="floating">Payment Date</ion-label>
-  <ion-input type="text" formControlName="paydate" (click)="showCalender('paydate')" [readonly]="true"></ion-input>
-</ion-item>
+  <ion-col>
+    <ion-item lines="full">
+      <ion-label position="floating">Payment Date</ion-label>
+      <ion-input type="text" formControlName="paydate" (click)="showCalender('paydate')" [readonly]="true"></ion-input>
+    </ion-item>
+  </ion-col>
+  <ion-col>
+    <ion-item lines="full">
+      <ion-label position="floating">Next Due Date</ion-label>
+      <ion-input type="text" formControlName="duedate" (click)="showCalender('duedate')" [readonly]="true"></ion-input>
+    </ion-item>
+    
+  </ion-col>
 
-<ion-item lines="full">
-  <ion-label position="floating">Next Due Date</ion-label>
-  <ion-input type="text" formControlName="duedate" (click)="showCalender('duedate')" [readonly]="true"></ion-input>
-</ion-item>
-
+</ion-row>
 <ion-item lines="full">
   <ion-label position="floating">Comments</ion-label>
   <ion-input type="text" formControlName="comments"></ion-input>
 </ion-item>
 
-</ion-row>
   </form>
 
   <ion-row>

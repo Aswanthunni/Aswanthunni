@@ -28,6 +28,8 @@ export class AddCustomerPage implements OnInit {
     maximumImagesCount: 1,
     quality: 50
   };
+  gymPackMonth = 0;
+  adPackMonth = 0;
   type:string;
   userId: any;
   gymTempData: any;
@@ -66,11 +68,10 @@ export class AddCustomerPage implements OnInit {
     this.customerForm = this.fb.group({
       name: ['', Validators.required],
       email: ['',  Validators.compose([
-        Validators.required,
         Validators.pattern('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$')
       ])],
-      dob: ['', Validators.required],
-      age: ['', Validators.required],
+      dob: [''],
+      age: [''],
       mobile: ['', [Validators.required, Validators.pattern("^((\\+91-?)|0)?[0-9]{10}$")]],
       gender: ['', Validators.required],
       address1: ['', Validators.required],
@@ -89,8 +90,8 @@ export class AddCustomerPage implements OnInit {
       gymbalance: ['', Validators.min(0)],
       regfees: ['', [Validators.required, Validators.min(0)]],
       regfeesPaid : ['', [Validators.required, Validators.min(0)]],
-      height: ['', Validators.required],
-      weight: ['', Validators.required]
+      height: [''],
+      weight: ['']
     });
 
     this.customerForm.controls.gymtotalpaid.valueChanges.subscribe((value) => {
@@ -140,16 +141,20 @@ export class AddCustomerPage implements OnInit {
   //  this.croppedImagepath = res.img;
   }
 
-  pickImage(sourceType) {
+  pickImage(sourceType, type= 'cam') {
     const options: CameraOptions = {
       quality: 20,
       sourceType: sourceType,
       destinationType: this.camera.DestinationType.FILE_URI,
       encodingType: this.camera.EncodingType.JPEG,
       mediaType: this.camera.MediaType.PICTURE,
-      saveToPhotoAlbum : true
+      saveToPhotoAlbum : false
     }
     this.camera.getPicture(options).then((imageData) => {
+      alert(JSON.stringify(imageData));
+      if (type === 'lib') {
+        imageData = 'file://'+imageData;
+      }
      this.photo.saveImage(imageData, 'Gym Album').then((res) => {
     this.imagePath = res.fileName;
      this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', res.fileName);
@@ -186,15 +191,25 @@ export class AddCustomerPage implements OnInit {
       {
         text: 'Cancel',
         role: 'cancel'
-      }
+      },
+      {
+        text: 'Load from Library',
+        handler: () => {
+          this.pickImage(this.camera.PictureSourceType.PHOTOLIBRARY, 'lib');
+        }
+      },
       ]
     });
     await actionSheet.present();
   }
 
   showCalender(controls) {
+    let date = new Date()
+    if (this.customerForm.get(controls).value) {
+      date = new Date(this.customerForm.get(controls).value);
+    }
     this.datePicker.show({
-      date: new Date(),
+      date: date,
       mode: 'date',
       androidTheme: this.datePicker.ANDROID_THEMES.THEME_HOLO_DARK
     }).then(
@@ -203,6 +218,17 @@ export class AddCustomerPage implements OnInit {
         this.customerForm.get(controls).setValue(dFormat);
         if (controls === 'dob') {
         this.calculateAge(dFormat);
+        }
+        if (controls === 'gympaydate') {
+          var d = new Date(dFormat);
+          d.setMonth(d.getMonth() + +this.gymPackMonth);
+          const fl = d.getDate()+" "+d.toLocaleString('default', { month: 'short' })+" "+d.getFullYear();
+          this.customerForm.get('gymduedate').setValue(fl);
+        } else if (controls === 'adpaydate') {
+          var d = new Date(dFormat);
+          d.setMonth(d.getMonth() + +this.adPackMonth);
+          const fl = d.getDate()+" "+d.toLocaleString('default', { month: 'short' })+" "+d.getFullYear();
+          this.customerForm.get('adduedate').setValue(fl);
         }
       },
       err => console.log('Error occurred while getting date: ', err)
@@ -258,6 +284,7 @@ export class AddCustomerPage implements OnInit {
       const index = this.gymPackage.findIndex( i => i.id == id);
       if (index > -1) {
         this.customerForm.get('gymFees').setValue(this.gymPackage[index].fees);
+        this.gymPackMonth = this.gymPackage[index].month;
       }
     }
   }
@@ -268,6 +295,7 @@ export class AddCustomerPage implements OnInit {
       const index = this.adPackage.findIndex( i => i.id == id);
       if (index > -1) {
         this.customerForm.get('adFees').setValue(this.adPackage[index].fees);
+        this.adPackMonth = this.adPackage[index].month;
       }
     }
   }

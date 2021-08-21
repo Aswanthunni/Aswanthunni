@@ -21,6 +21,8 @@ export class AdmissionTransPage implements OnInit {
     this.getTransCount();
   }
 
+  ionViewWillEnter() { window.dispatchEvent(new Event('resize')); }
+
   getTransCount() {
     return this.db.storage.executeSql('SELECT COUNT(regfeedue.id) as count FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid',[]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
@@ -139,5 +141,9 @@ export class AdmissionTransPage implements OnInit {
       }
     }, 500);
   }
+
+  itemHeightFn(item, index) {
+    return 115;
+}
 
 }

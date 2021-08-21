@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { ActivateCustomerPageRoutingModule } from './activate-customer-routing.module';
 
 import { ActivateCustomerPage } from './activate-customer.page';
+import { ImagePreviewPageModule } from '../image-preview/image-preview.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    ActivateCustomerPageRoutingModule
+    ActivateCustomerPageRoutingModule,
+    ImagePreviewPageModule
   ],
   declarations: [ActivateCustomerPage]
 })

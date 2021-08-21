@@ -14,7 +14,7 @@
 
 <ion-content [fullscreen]="true">
   <ion-list>
-    <ion-virtual-scroll [items]="dueData" *ngIf="dueData.length" approxItemHeight="50px">
+    <ion-virtual-scroll [items]="dueData" *ngIf="dueData.length" approxItemHeight="68px" [itemHeight]="itemHeightFn">
       <ion-item-sliding *virtualItem="let item">
       <ion-item-options side="end">
         <ion-item-option (click)="settle(item)">
@@ -22,7 +22,7 @@
         </ion-item-option> 
         </ion-item-options>
       <ion-item>
-        <ion-avatar style="margin: auto;">
+        <ion-avatar style="margin: auto;" (click)="imagePreview(item.img)">
           <img  [src]="item.img">
         </ion-avatar>
         <ion-label style="margin-left: 1rem;">
@@ -36,6 +36,10 @@
 
     </ion-item-sliding>  
     </ion-virtual-scroll>
+    <ion-item lines="none" *ngIf="this.dueData.length == this.totalCustomer" style="     display:block;
+    text-align: center;">
+      <ion-label><p style="font-weight: bold;">End of Results</p></ion-label>
+    </ion-item>
   </ion-list>
   <ion-infinite-scroll  (ionInfinite)="loadData($event)">
     <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data...">

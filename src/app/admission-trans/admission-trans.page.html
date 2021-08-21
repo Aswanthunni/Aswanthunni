@@ -13,7 +13,7 @@
 </ion-header>
 <ion-content>
   <ion-list>
-    <ion-virtual-scroll [items]="dueData" *ngIf="dueData.length" approxItemHeight="50px">
+    <ion-virtual-scroll [items]="dueData" *ngIf="dueData.length" approxItemHeight="115px" [itemHeight]="itemHeightFn">
       <ion-item-sliding *virtualItem="let item">
       <ion-item-options side="end">
         <ion-item-option color="danger" (click)="delete(item.id)">
@@ -33,6 +33,10 @@
 
     </ion-item-sliding>
     </ion-virtual-scroll>
+    <ion-item lines="none" *ngIf="this.dueData.length == this.totalCustomer" style="     display:block;
+    text-align: center;">
+      <ion-label><p style="font-weight: bold;">End of Results</p></ion-label>
+    </ion-item>
   </ion-list>
 
   <ion-infinite-scroll  (ionInfinite)="loadData($event)">

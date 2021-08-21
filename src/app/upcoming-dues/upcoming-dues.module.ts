@@ -8,6 +8,7 @@ import { UpcomingDuesPageRoutingModule } from './upcoming-dues-routing.module';
 
 import { UpcomingDuesPage } from './upcoming-dues.page';
 import { CommonFilterComponent } from '../common-filter/common-filter.component';
+import { ImagePreviewPageModule } from '../image-preview/image-preview.module';
 
 @NgModule({
   imports: [
@@ -16,7 +17,8 @@ import { CommonFilterComponent } from '../common-filter/common-filter.component'
     IonicModule,
     UpcomingDuesPageRoutingModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    ImagePreviewPageModule
   ],
   declarations: [UpcomingDuesPage, CommonFilterComponent]
 })
