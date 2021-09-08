@@ -24,7 +24,7 @@ export class AdmissionTransPage implements OnInit {
   ionViewWillEnter() { window.dispatchEvent(new Event('resize')); }
 
   getTransCount() {
-    return this.db.storage.executeSql('SELECT COUNT(regfeedue.id) as count FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid',[]).then(data => { 
+    return this.db.storage.executeSql('SELECT COUNT(regfeedue.id) as count FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid where customertable.isactive = 1',[]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.totalCustomer = item.count;
@@ -36,13 +36,13 @@ export class AdmissionTransPage implements OnInit {
   }
 
   getTrans(limit, offset) {
-    return this.db.storage.executeSql('SELECT regfeedue.id as id, name, mobile, totalpaid, paymentdate, comments FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid LIMIT ? OFFSET ?',[limit, offset]).then(data => { 
+    return this.db.storage.executeSql('SELECT regfeedue.id as id, name, mobile, totalpaid, paymentdate, comments FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid where customertable.isactive = 1 LIMIT ? OFFSET ?',[limit, offset]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.dueData.push(item);
       }
       this.dueData.sort((a, b) => new Date(b.paymentdate).getTime() - new Date(a.paymentdate).getTime());
-      this.cloneArray = this.dueData;
+      this.cloneArray = JSON.parse(JSON.stringify(this.dueData));
             //Hide Infinite List Loader on Complete
             this.infiniteScroll.complete();
 
@@ -62,31 +62,29 @@ export class AdmissionTransPage implements OnInit {
       return;
     }
   
-    this.dueData = this.cloneArray.filter(currentFood => {
-      if (currentFood.name && searchTerm) {
-        return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
-      }
-    });
+    // this.dueData = this.cloneArray.filter(currentFood => {
+    //   if (currentFood.name && searchTerm) {
+    //     return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
+    //   }
+    // });
 
-    if (!this.dueData.length && searchTerm && searchTerm.length > 4) {
+    if (searchTerm) {
       this.searchinDB(searchTerm);
     }
   }
 
   searchinDB(string) {
-    let a = [string+'%']
+    let a = ['%'+string+'%', '%'+string+'%']
     let b = [];
-    return this.db.storage.executeSql('SELECT regfeedue.id as id, name, mobile, totalpaid, paymentdate, comments FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid where name LIKE ?',a).then(data => { 
+    return this.db.storage.executeSql('SELECT regfeedue.id as id, name, mobile, totalpaid, paymentdate, comments FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid where (name LIKE ? or mobile LIKE ?) and customertable.isactive = 1',a).then(data => { 
       //  this.db.dismissLoader();
            for (let i = 0; i < data.rows.length; i++) {
              let item = data.rows.item(i);
              b.push(item);
            }
-           if (b.length) {
             this.dueData = b;
             this.infiniteScroll.complete();
             this.virtualScroll.checkEnd();
-           }
          },(err) => {
            alert(JSON.stringify(err));
        //  this.db.dismissLoader();

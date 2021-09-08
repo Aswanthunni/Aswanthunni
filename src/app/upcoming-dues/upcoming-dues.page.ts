@@ -42,7 +42,7 @@ export class UpcomingDuesPage implements OnInit {
       }
     })
     this.dueData.sort((a, b) => new Date(a.duedate).getTime() - new Date(b.duedate).getTime());
-    this.cloneArray = this.dueData;
+    this.cloneArray = JSON.parse(JSON.stringify(this.dueData));
   }
 
   getGymData() {

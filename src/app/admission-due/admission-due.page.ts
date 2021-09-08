@@ -28,7 +28,7 @@ export class AdmissionDuePage implements OnInit {
   ionViewWillEnter() { window.dispatchEvent(new Event('resize')); }
 
   getGymDataCount() {
-    return this.db.storage.executeSql('SELECT COUNT(regfeedue.customerid) as count FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid GROUP BY regfeedue.customerid HAVING SUM(balance) > 0 ',[]).then(data => { 
+    return this.db.storage.executeSql('SELECT COUNT(DISTINCT regfeedue.customerid) as count FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid where customertable.isactive = 1 GROUP BY regfeedue.customerid HAVING SUM(balance) > 0 ',[]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.totalCustomer += +item.count;
@@ -40,13 +40,13 @@ export class AdmissionDuePage implements OnInit {
   }
 
   getGymData(limit, offset) {
-    return this.db.storage.executeSql('SELECT SUM(balance) as due, name, img, fees, mobile, customertable.id as userId FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid GROUP BY regfeedue.customerid HAVING SUM(balance) > 0 ORDER BY name ASC LIMIT ? OFFSET ?',[limit, offset]).then(data => { 
+    return this.db.storage.executeSql('SELECT SUM(balance) as due, name, img, fees, mobile, customertable.id as userId FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid where customertable.isactive = 1 GROUP BY regfeedue.customerid HAVING SUM(balance) > 0 ORDER BY name COLLATE NOCASE ASC LIMIT ? OFFSET ?',[limit, offset]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', item.img, item);
         this.dueData.push(item);
       }
-      this.cloneArray = this.dueData;
+      this.cloneArray = JSON.parse(JSON.stringify(this.dueData));
       this.infiniteScroll.complete();
       this.virtualScroll.checkEnd();
     },(err) => {
@@ -72,32 +72,30 @@ export class AdmissionDuePage implements OnInit {
       return;
     }
   
-    this.dueData = this.cloneArray.filter(currentFood => {
-      if (currentFood.name && searchTerm) {
-        return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
-      }
-    });
+    // this.dueData = this.cloneArray.filter(currentFood => {
+    //   if (currentFood.name && searchTerm) {
+    //     return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
+    //   }
+    // });
 
-    if (!this.dueData.length && searchTerm && searchTerm.length > 4) {
+    if (searchTerm) {
       this.searchinDB(searchTerm);
     }
   }
 
   searchinDB(string) {
-    let a = [string+'%']
+    let a = ['%'+string+'%', '%'+string+'%']
     let b = [];
-    return this.db.storage.executeSql('SELECT SUM(balance) as due, name, img, fees, mobile, customertable.id as userId FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid where name LIKE ? GROUP BY regfeedue.customerid HAVING SUM(balance) > 0 ORDER BY name ASC',a).then(data => { 
+    return this.db.storage.executeSql('SELECT SUM(balance) as due, name, img, fees, mobile, customertable.id as userId FROM regfeedue INNER JOIN customertable ON customertable.id = regfeedue.customerid where (name LIKE ? or mobile LIKE ?) and customertable.isactive = 1 GROUP BY regfeedue.customerid HAVING SUM(balance) > 0 ORDER BY name COLLATE NOCASE ASC',a).then(data => { 
       //  this.db.dismissLoader();
            for (let i = 0; i < data.rows.length; i++) {
              let item = data.rows.item(i);
              this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', item.img, item);
              b.push(item);
            }
-           if (b.length) {
             this.dueData = b;
             this.infiniteScroll.complete();
             this.virtualScroll.checkEnd();
-           }
          },(err) => {
            alert(JSON.stringify(err));
        //  this.db.dismissLoader();

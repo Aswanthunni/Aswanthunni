@@ -8,6 +8,10 @@ import { PackageListPageRoutingModule } from './package-list-routing.module';
 
 import { PackageListPage } from './package-list.page';
 import { PopupAddPackagePageModule } from '../popup-add-package/popup-add-package.module';
+import { BalanceDuePopupPageModule } from '../balance-due-popup/balance-due-popup.module';
+import { TransNewPageModule } from '../trans-new/trans-new.module';
+import { BalanceSettlePopupPageModule } from '../balance-settle-popup/balance-settle-popup.module';
+import { ImagePreviewPageModule } from '../image-preview/image-preview.module';
 
 @NgModule({
   imports: [
@@ -15,7 +19,10 @@ import { PopupAddPackagePageModule } from '../popup-add-package/popup-add-packag
     FormsModule,
     IonicModule,
     PackageListPageRoutingModule,
-    PopupAddPackagePageModule
+    PopupAddPackagePageModule,
+    BalanceSettlePopupPageModule,
+    TransNewPageModule,
+    ImagePreviewPageModule
   ],
   declarations: [PackageListPage]
 })

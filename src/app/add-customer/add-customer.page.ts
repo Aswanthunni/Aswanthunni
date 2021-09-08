@@ -5,10 +5,9 @@ import { DatePicker } from '@ionic-native/date-picker/ngx';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DbService } from '../db.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PhotoLibrary } from '@ionic-native/photo-library/ngx';
 import { File } from '@ionic-native/file/ngx';
 import { DomSanitizer } from '@angular/platform-browser';
-
+import * as uuid from 'uuid';
 @Component({
   selector: 'app-add-customer',
   templateUrl: './add-customer.page.html',
@@ -35,6 +34,7 @@ export class AddCustomerPage implements OnInit {
   gymTempData: any;
   btntext = '';
   title = '';
+  imageData = '';
   gymmanArray = ['gympaydate','gymduedate', 'gympackage', 'gymFees', 'gymtotalpaid', 'gymbalance'];
   admanArray = ['adpaydate','adduedate', 'adpackage', 'adFees', 'adtotalpaid', 'adbalance'];
 
@@ -46,7 +46,6 @@ export class AddCustomerPage implements OnInit {
     private db: DbService,
     public router: Router,
     private nav: NavController,
-    private photo: PhotoLibrary,
     private file: File,
     private dom: DomSanitizer
   ) { }
@@ -62,6 +61,20 @@ export class AddCustomerPage implements OnInit {
       this.title = 'Update Customer';
     }
     this.buildForm();
+    this.getLatestAdFees();
+    this.checkDirExist();
+  }
+
+  checkDirExist() {
+    this.file.checkDir(this.file.externalRootDirectory + 'Pictures/', 'Gym Album').then(response => {
+		//	alert(JSON.stringify(response));
+		}).catch(err => {
+			this.file.createDir(this.file.externalRootDirectory + 'Pictures/', 'Gym Album', false).then(response => {
+		//		alert(JSON.stringify(response));
+			}).catch(err => {
+				alert(JSON.stringify(err));
+			}); 
+		});
   }
 
   buildForm() {
@@ -122,6 +135,17 @@ export class AddCustomerPage implements OnInit {
     });
   }
 
+  getLatestAdFees() {
+    return this.db.storage.executeSql('SELECT fees FROM admission WHERE id IN (SELECT MAX(id) FROM admission)',[]).then(data => { 
+      for (let i = 0; i < data.rows.length; i++) {
+        let item = data.rows.item(i);
+        this.customerForm.get('regfees').setValue(+item.fees);
+      }
+    },(err) => {
+      alert(JSON.stringify(err));
+    });
+  }
+
   preDefineValues(res) {
     this.customerForm.controls.name.setValue(res.name);
     this.customerForm.controls.email.setValue(res.email);
@@ -145,24 +169,21 @@ export class AddCustomerPage implements OnInit {
     const options: CameraOptions = {
       quality: 20,
       sourceType: sourceType,
-      destinationType: this.camera.DestinationType.FILE_URI,
+      destinationType: this.camera.DestinationType.DATA_URL,
       encodingType: this.camera.EncodingType.JPEG,
       mediaType: this.camera.MediaType.PICTURE,
       saveToPhotoAlbum : false
     }
-    this.camera.getPicture(options).then((imageData) => {
-      alert(JSON.stringify(imageData));
-      if (type === 'lib') {
-        imageData = 'file://'+imageData;
-      }
-     this.photo.saveImage(imageData, 'Gym Album').then((res) => {
-    this.imagePath = res.fileName;
-     this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', res.fileName);
-     },
-     (err) => {
-      alert(JSON.stringify(err));
-     }
-     )
+    this.camera.getPicture(options).then(async (imageData) => {
+      const base64Response = await fetch(`data:image/jpeg;base64,${imageData}`);
+      const blob = await base64Response.blob();
+      this.file.writeFile(this.file.externalRootDirectory + 'Pictures/Gym Album/', uuid.v4()+'.jpeg' ,blob)
+      .then((res) => {
+         this.imagePath = res.name;
+         this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', res.name);
+      }, (err) => {
+        alert(JSON.stringify(err));
+      })
     }, (err) => {
       // Handle error
     });
@@ -376,6 +397,7 @@ export class AddCustomerPage implements OnInit {
         this.customerForm.controls.regfees.value, this.customerForm.controls.gympackage.value,
         this.customerForm.controls.adpackage.value, joinDate,
         this.imagePath, 1];
+      this.db.showLoader();
       return this.db.storage.executeSql('INSERT INTO customertable (name, email, dob, age, mobile, gender, address1, address2, height, weight, regfees, gympackid, addpackid, createdate, img, isactive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
       .then(res => {
         this.updateRegDue(res.insertId);
@@ -459,6 +481,7 @@ export class AddCustomerPage implements OnInit {
 
     emiEvent() {
       setTimeout(() => {
+        this.db.dismissLoader();
         alert('Customer Created Successfully');
         this.db.customerCreate.next('created');
         this.nav.pop();

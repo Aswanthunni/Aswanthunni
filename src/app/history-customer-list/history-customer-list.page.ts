@@ -24,50 +24,22 @@ export class HistoryCustomerListPage implements OnInit {
 
   ngOnInit() {
     this.path = this.activatedRoute.snapshot.paramMap.get('id');
-    if (this.path === 'due') {
-      this.getTotalCustomerDue();
-    } else {
-      this.getTotalCustomer()
-    }
+    this.getTotalCustomerDue();
   }
 
   ionViewWillEnter() { window.dispatchEvent(new Event('resize')); }
 
-  fetchPackage(limit, offset) {
-    //  this.db.showLoader();
-      let data = [limit, offset];
-      return this.db.storage.executeSql('SELECT * FROM customertable ORDER BY name ASC LIMIT ? OFFSET ?',data).then(data => { 
-     //   this.db.dismissLoader();
-        for (let i = 0; i < data.rows.length; i++) {
-          let item = data.rows.item(i);
-          this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', item.img, item);
-          this.custData.push(item);
-        }
-        this.custData.sort((a, b) => b.isactive - a.isactive || a.name.localeCompare(b.name));
-        this.cloneArray = this.custData;
-                //Hide Infinite List Loader on Complete
-                this.infiniteScroll.complete();
-  
-                //Rerender Virtual Scroll List After Adding New Data
-                this.virtualScroll.checkEnd();
-          
-      },(err) => {
-        alert(JSON.stringify(err));
-      //  this.db.dismissLoader();
-      });
-    }
-
     fetchPackagedue(limit, offset) {
       //  this.db.showLoader();
         let data = [limit, offset];
-        return this.db.storage.executeSql('SELECT * FROM customertable where isactive = 1 ORDER BY name ASC LIMIT ? OFFSET ?', data).then(data => { 
+        return this.db.storage.executeSql('SELECT * FROM customertable where isactive = 1 ORDER BY name COLLATE NOCASE ASC LIMIT ? OFFSET ?', data).then(data => { 
        //   this.db.dismissLoader();
           for (let i = 0; i < data.rows.length; i++) {
             let item = data.rows.item(i);
             this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', item.img, item);
             this.custData.push(item);
           }
-          this.cloneArray = this.custData;
+          this.cloneArray = JSON.parse(JSON.stringify(this.custData));
                           //Hide Infinite List Loader on Complete
                           this.infiniteScroll.complete();
   
@@ -79,25 +51,13 @@ export class HistoryCustomerListPage implements OnInit {
         });
       }
 
-      getTotalCustomer() {
-        return this.db.storage.executeSql('SELECT COUNT(id) as count FROM customertable',[]).then(data => { 
-             for (let i = 0; i < data.rows.length; i++) {
-               let item = data.rows.item(i);
-               this.totalCustomer = item.count;
-             }
-             this.fetchPackage(10, 0);
-           },(err) => {
-             alert(JSON.stringify(err));
-           });
-      }
-
       getTotalCustomerDue() {
         return this.db.storage.executeSql('SELECT COUNT(id) as count FROM customertable where isactive = 1',[]).then(data => { 
              for (let i = 0; i < data.rows.length; i++) {
                let item = data.rows.item(i);
                this.totalCustomer = item.count;
              }
-             this.fetchPackage(10, 0);
+             this.fetchPackagedue(10, 0);
            },(err) => {
              alert(JSON.stringify(err));
            });
@@ -111,36 +71,34 @@ export class HistoryCustomerListPage implements OnInit {
         return;
       }
     
-      this.custData = this.cloneArray.filter(currentFood => {
-        if (currentFood.name && searchTerm) {
-          return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1) || (currentFood.mobile.indexOf(searchTerm) > -1);
-        }
-      });
+      // this.custData = this.cloneArray.filter(currentFood => {
+      //   if (currentFood.name && searchTerm) {
+      //     return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1) || (currentFood.mobile.indexOf(searchTerm) > -1);
+      //   }
+      // });
 
-      if (!this.custData.length && this.path === 'due' && searchTerm && searchTerm.length > 4) {
+      if (this.path === 'due' && searchTerm) {
         this.searchinDBDue(searchTerm);
-      } else if (!this.custData.length && searchTerm && searchTerm.length > 4) {
+      } else if (searchTerm) {
         this.searchinDB(searchTerm);
       }
     }
     searchinDB(string) {
       let a = ['%'+string+'%', '%'+string+'%']
       let b = [];
-      return this.db.storage.executeSql('SELECT * FROM customertable where (name LIKE ? or mobile LIKE ?) and isactive = 1 ORDER BY name ASC',a).then(data => { 
+      return this.db.storage.executeSql('SELECT * FROM customertable where (name LIKE ? or mobile LIKE ?) and isactive = 1 ORDER BY name COLLATE NOCASE ASC',a).then(data => { 
         //  this.db.dismissLoader();
              for (let i = 0; i < data.rows.length; i++) {
                let item = data.rows.item(i);
                this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', item.img, item);
                b.push(item);
              }
-             if (b.length) {
               this.custData = b;
                                //Hide Infinite List Loader on Complete
                                this.infiniteScroll.complete();
   
                                //Rerender Virtual Scroll List After Adding New Data
                                this.virtualScroll.checkEnd();
-             }
            },(err) => {
              alert(JSON.stringify(err));
          //  this.db.dismissLoader();
@@ -150,14 +108,13 @@ export class HistoryCustomerListPage implements OnInit {
     searchinDBDue(string) {
       let a = ['%'+string+'%', '%'+string+'%']
       let b = [];
-      return this.db.storage.executeSql('SELECT * FROM customertable where name (name LIKE ? or mobile LIKE ?) ORDER BY name ASC',a).then(data => { 
+      return this.db.storage.executeSql('SELECT * FROM customertable where (name LIKE ? or mobile LIKE ?) and isactive = 1 ORDER BY name COLLATE NOCASE ASC',a).then(data => { 
         //  this.db.dismissLoader();
              for (let i = 0; i < data.rows.length; i++) {
                let item = data.rows.item(i);
                this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', item.img, item);
                b.push(item);
              }
-             if (b.length) {
               this.custData = b;
                                //Hide Infinite List Loader on Complete
                                this.infiniteScroll.complete();
@@ -165,7 +122,6 @@ export class HistoryCustomerListPage implements OnInit {
                                //Rerender Virtual Scroll List After Adding New Data
                                this.virtualScroll.checkEnd();
   
-             }
            },(err) => {
              alert(JSON.stringify(err));
          //  this.db.dismissLoader();
@@ -188,8 +144,8 @@ export class HistoryCustomerListPage implements OnInit {
       // Using settimeout to simulate api call 
       setTimeout(() => {
   
-        // load more data
-        this.fetchPackage(this.limit, this.offset)
+
+          this.fetchPackagedue(this.limit, this.offset)
   
 
         // App logic to determine if all data is loaded

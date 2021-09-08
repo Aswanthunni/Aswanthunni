@@ -1,8 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, SecurityContext } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { AlertController, ModalController } from '@ionic/angular';
+import { BalanceDuePopupPage } from '../balance-due-popup/balance-due-popup.page';
+import { BalanceSettlePopupPage } from '../balance-settle-popup/balance-settle-popup.page';
 import { DbService } from '../db.service';
 import { PopupAddPackagePage } from '../popup-add-package/popup-add-package.page';
+import { TransNewPage } from '../trans-new/trans-new.page';
+import { File } from '@ionic-native/file/ngx';
+import { ImagePreviewPage } from '../image-preview/image-preview.page';
 
 @Component({
   selector: 'app-package-list',
@@ -15,7 +21,7 @@ export class PackageListPage implements OnInit {
   packageId = [];
   balanceArray = [];
   userId: any;
-  constructor(public db: DbService, public modalController: ModalController, private alertCtrl: AlertController) { }
+  constructor(public db: DbService, public modalController: ModalController, private alertCtrl: AlertController, private file: File, private dom: DomSanitizer) { }
 
   ngOnInit() {
     this.userId = this.db.userId
@@ -27,10 +33,11 @@ export class PackageListPage implements OnInit {
     this.packageId = [];
     this.packageId = [];
     this.balanceArray = [];
-    return this.db.storage.executeSql('SELECT * FROM gympackagedue WHERE id IN (SELECT MAX(id) FROM gympackagedue where customerid = ? GROUP BY packageid)',[id]).then(data => { 
+    return this.db.storage.executeSql('SELECT gympackagedue.id, customerid, packageid, totalpaid, balance, paymentdate, duedate, gympackagedue.createdate,comments,gympackagedue.isactive, img FROM gympackagedue inner join customertable on customertable.id = gympackagedue.customerid WHERE gympackagedue.id IN (SELECT MAX(id) FROM gympackagedue where customerid = ? GROUP BY packageid)',[id]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.packageId.push(item.packageid)
+        this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', item.img, item);
         this.fetchAllPackage.push(item);
       }
       this.sumtotalbal(id);
@@ -75,7 +82,7 @@ export class PackageListPage implements OnInit {
 
       if (index2 > -1) {
         data.paid = this.balanceArray[index2].total;
-        data.balance = this.balanceArray[index2].bal;
+        data.bal = this.balanceArray[index2].bal;
       }
     })
 
@@ -155,6 +162,67 @@ export class PackageListPage implements OnInit {
 
     await alert.present();
   }
+
+  async updatebalance(data) {
+    data.userId = this.userId;
+    data.type = 'gym';
+    data.page = 'customerlist';
+    const modal = await this.modalController.create({
+      component: BalanceSettlePopupPage,
+      componentProps : {params : { data }},
+      swipeToClose: true,
+      presentingElement: await this.modalController.getTop() // Get the top-most ion-modal
+    });
+    modal.onDidDismiss().then((data) => {
+      if (data.data === 'update') {
+        this.getLatestGymdata(this.userId);
+      }
+    })
+    return await modal.present()
+  }
+
+  async newPackage() {
+    const data = {id : this.userId, type: 'gym'};
+    const modal = await this.modalController.create({
+      component: TransNewPage,
+      componentProps : {params : data},
+      swipeToClose: true,
+      presentingElement: await this.modalController.getTop() // Get the top-most ion-modal
+    });
+
+    modal.onDidDismiss().then((data) => {
+      if (data.data === 'update') {
+        this.getLatestGymdata(this.userId);
+      }
+    })
+
+    return await modal.present()
+  }
+
+  getSanitizedImage(path, imageName, item){
+    this.file.readAsDataURL(path, imageName)
+    .then((data)=>{
+      item.img = this.dom.sanitize(SecurityContext.RESOURCE_URL, this.dom.bypassSecurityTrustResourceUrl(data));
+    })
+    .catch((err)=>{
+    //  alert(JSON.stringify(err));
+    });
+}
+
+async imagePreview(data) {
+  const modal = await this.modalController.create({
+    component: ImagePreviewPage,
+    componentProps : {params : data},
+    swipeToClose: true,
+    presentingElement: await this.modalController.getTop() // Get the top-most ion-modal
+  });
+
+  modal.onDidDismiss().then((data) => {
+    
+  })
+
+  return await modal.present()
+}
 
 
 

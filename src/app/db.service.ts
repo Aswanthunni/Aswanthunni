@@ -132,18 +132,19 @@ export class DbService {
 
   // Dismiss loader
   dismissLoader() {
-    this.loadingController.dismiss().then((response) => {
-      console.log('Loader closed!', response);
-    }).catch((err) => {
-      alert(JSON.stringify(err))
-    });
+    setTimeout(() => {
+      this.loadingController.dismiss().then((response) => {
+        console.log('Loader closed!', response);
+      }).catch((err) => {
+        alert(JSON.stringify(err))
+      });
+    }, 100)
   }
 
   replacedb(data) {
     this.showLoader();
     this.sqlPorter.importSqlToDb(this.storage, data).then((res) => {
-      alert('Data Restored Successfully');
-      this.dismissLoader();
+      this.logRestore();
     }).catch((err) => {
       this.dismissLoader();
       alert(JSON.stringify(err))
@@ -175,6 +176,17 @@ export class DbService {
       .then(res => {
         this.dismissLoader();
         alert('Database backup is successfull');
+        this.backup.next('');
+      });
+  }
+
+  logRestore() {
+    const dateTime = new Date();
+    const dFormat = dateTime.getDate()+" "+dateTime.toLocaleString('default', { month: 'short' })+" "+dateTime.getFullYear();
+    return this.storage.executeSql('INSERT INTO restore (lastdate) VALUES (?)', [dFormat])
+      .then(res => {
+        this.dismissLoader();
+        alert('Data Restored Successfully');
         this.backup.next('');
       });
   }

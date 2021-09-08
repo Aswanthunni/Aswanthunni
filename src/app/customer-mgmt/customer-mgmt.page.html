@@ -27,12 +27,9 @@
           <ion-item-option color="danger" (click)="presentAlertConfirm(item.id)">
             <ion-icon slot="icon-only" name="trash"></ion-icon>
           </ion-item-option>
-          <ion-item-option (click)="navigatePackage(item.id)" color="secondary">
-            <ion-icon slot="icon-only" name="barbell"></ion-icon>
-          </ion-item-option>
         </ion-item-options>
     
-        <ion-item>
+        <ion-item (click)="navigatePackage(item.id)">
           <ion-avatar style="margin: auto;" (click)="imagePreview(item.img)">
             <img  [src]="item.img">
           </ion-avatar>

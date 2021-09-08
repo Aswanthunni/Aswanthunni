@@ -61,6 +61,7 @@ export class BalanceDuePopupPage implements OnInit, OnDestroy {
 
   async updatebalance(data) {
     data.userId = this.params.userId;
+    data.page = 'balancelist';
     const modal = await this.modalController.create({
       component: BalanceSettlePopupPage,
       componentProps : {params : { data }},

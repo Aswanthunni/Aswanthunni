@@ -20,8 +20,10 @@
         <ion-item-option (click)="presentAlertConfirm(item.id)">
           <ion-icon slot="icon-only" name="refresh-circle"></ion-icon>
         </ion-item-option>
+        <ion-item-option (click)="delete(item.id)" color="danger">
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+        </ion-item-option>
       </ion-item-options>
-  
       <ion-item>
         <ion-avatar style="margin: auto;" (click)="imagePreview(item.img)">
           <img  [src]="item.img">

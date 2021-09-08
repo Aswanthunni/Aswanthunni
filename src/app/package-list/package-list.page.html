@@ -1,7 +1,7 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Active Gym Package</ion-title>
-  </ion-toolbar>
+  <ion-avatar style="margin: auto;margin-top: 1rem;margin-bottom: 1rem;" *ngIf="fetchAllPackage.length" (click)="imagePreview(fetchAllPackage[0].img)">
+    <img  [src]="fetchAllPackage[0].img" >
+  </ion-avatar>
 </ion-header>
 
 <ion-content>
@@ -36,22 +36,25 @@
           </ion-col>
           <ion-col>
            <p>Balance Amount :</p>
-           <p>₹{{i.balance}}</p>
+           <p style="color: red; font-weight: bold;">₹{{i.bal}}</p>
           </ion-col>
         </ion-row>
         <ion-row>
           <ion-col *ngIf="i.isactive == 1">
-            <p style="color: red">Due On : {{i.duedate}}</p>
+            <p style="color: red; font-weight: bold;">Due On : {{i.duedate}}</p>
           </ion-col>
           <ion-col *ngIf="i.isactive == 0">
               <ion-button type="submit" color="danger" expand="block" [disabled]="true">DeActivated</ion-button>
           </ion-col>
         </ion-row>
-       <!-- <ion-row *ngIf="i.isactive == 1">
+       <ion-row *ngIf="i.isactive == 1">
          <ion-col>
-          <ion-button type="submit" color="danger" expand="block" (click)="delete(i.packageid)">Delete</ion-button>
+          <ion-button type="submit" color="secondary" expand="block" (click)="updatebalance(i)" [disabled]="+i.bal === 0">Due Settle</ion-button>
          </ion-col>
-       </ion-row> -->
+         <ion-col>
+          <ion-button type="submit" color="primary" expand="block" (click)="newPackage()">New Payment</ion-button>
+         </ion-col>
+       </ion-row>
       </ion-card-content>
     </ion-card>
 

@@ -175,6 +175,9 @@ export class PopupAddPackagePage implements OnInit, OnDestroy {
       } else {
         this.makePreviousInactiveGym(this.params.packageId);
       }
+    } else {
+      alert('Package Added Successfully')
+      this.viewCtrl.dismiss('add');
     }
   }
 

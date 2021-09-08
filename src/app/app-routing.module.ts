@@ -126,6 +126,10 @@ const routes: Routes = [
   {
     path: 'admission-trans',
     loadChildren: () => import('./admission-trans/admission-trans.module').then( m => m.AdmissionTransPageModule)
+  },
+  {
+    path: 'settings',
+    loadChildren: () => import('./settings/settings.module').then( m => m.SettingsPageModule)
   }
 ];
 

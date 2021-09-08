@@ -14,6 +14,7 @@ import { DbService } from '../db.service';
 })
 export class BackupPage implements OnInit {
   lastLog = [];
+  restore = [];
   constructor(private file: File, public platform: Platform, private sqliteDbCopy: SqliteDbCopy, private androidPermissions: AndroidPermissions, private dbS: DbService) { }
 
   ngOnInit() {
@@ -107,6 +108,19 @@ export class BackupPage implements OnInit {
         let item = data.rows.item(i);
         this.lastLog.push(item);
       }
+      this.getrestoredate();
+    },(err) => {
+      alert(JSON.stringify(err));
+    });
+  }
+
+  getrestoredate() {
+    return this.dbS.storage.executeSql('SELECT * FROM restore WHERE id IN (SELECT MAX(id) FROM restore)',[]).then(data => { 
+      for (let i = 0; i < data.rows.length; i++) {
+        let item = data.rows.item(i);
+        this.restore.push(item);
+      }
+      
     },(err) => {
       alert(JSON.stringify(err));
     });

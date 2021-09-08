@@ -43,7 +43,7 @@ export class OverDuePage implements OnInit {
       }
     })
     this.dueData.sort((a, b) => new Date(b.duedate).getTime() - new Date(a.duedate).getTime());
-    this.cloneArray = this.dueData;
+    this.cloneArray = JSON.parse(JSON.stringify(this.dueData));
   }
 
   getGymData() {

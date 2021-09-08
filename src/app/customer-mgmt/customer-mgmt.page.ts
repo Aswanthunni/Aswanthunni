@@ -55,14 +55,14 @@ export class CustomerMgmtPage implements OnInit, OnDestroy {
  // this.db.showLoader();
   //  this.customerData = [];
   let data = [limit, offset];
-    return this.db.storage.executeSql('SELECT * FROM customertable where isactive = 1 ORDER BY name ASC LIMIT ? OFFSET ?',data).then(data => { 
+    return this.db.storage.executeSql('SELECT * FROM customertable where isactive = 1 ORDER BY name COLLATE NOCASE ASC LIMIT ? OFFSET ?',data).then(data => { 
  //  this.db.dismissLoader();
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
         this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', item.img, item);
         this.customerData.push(item);
       }
-      this.cloneArray = this.customerData;
+      this.cloneArray = JSON.parse(JSON.stringify(this.customerData));
       this.infiniteScroll.complete();
       this.virtualScroll.checkEnd();
    // alert(this.customerData.length)
@@ -90,13 +90,13 @@ export class CustomerMgmtPage implements OnInit, OnDestroy {
       return;
     }
   
-    this.customerData = this.cloneArray.filter(currentFood => {
-      if (currentFood.name && searchTerm) {
-        return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1) || (currentFood.mobile.indexOf(searchTerm) > -1);
-      }
-    });
+    // this.customerData = this.cloneArray.filter(currentFood => {
+    //   if (currentFood.name && searchTerm) {
+    //     return (currentFood.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1) || (currentFood.mobile.indexOf(searchTerm) > -1);
+    //   }
+    // });
 
-    if (!this.customerData.length && searchTerm && searchTerm.length > 4) {
+    if (searchTerm) {
       this.searchinDB(searchTerm);
     }
   }
@@ -104,19 +104,17 @@ export class CustomerMgmtPage implements OnInit, OnDestroy {
   searchinDB(string) {
     let a = ['%'+string+'%', '%'+string+'%']
     let b = [];
-    return this.db.storage.executeSql('SELECT * FROM customertable where (name LIKE ? or mobile like ?) and isactive = 1 ORDER BY name ASC',a).then(data => { 
+    return this.db.storage.executeSql('SELECT * FROM customertable where (name LIKE ? or mobile like ?) and isactive = 1 ORDER BY name COLLATE NOCASE ASC',a).then(data => { 
       //  this.db.dismissLoader();
            for (let i = 0; i < data.rows.length; i++) {
              let item = data.rows.item(i);
              this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', item.img, item);
              b.push(item);
            }
-           if (b.length) {
             this.customerData = b;
             this.infiniteScroll.complete();
             this.virtualScroll.checkEnd();
             
-           }
          },(err) => {
            alert(JSON.stringify(err));
        //  this.db.dismissLoader();

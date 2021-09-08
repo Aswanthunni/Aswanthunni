@@ -14,7 +14,6 @@ import { DatePicker } from '@ionic-native/date-picker/ngx';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SqliteDbCopy } from '@ionic-native/sqlite-db-copy/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { PhotoLibrary } from '@ionic-native/photo-library/ngx';
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -26,7 +25,7 @@ import { PhotoLibrary } from '@ionic-native/photo-library/ngx';
       provide: RouteReuseStrategy, 
       useClass: IonicRouteStrategy 
     },
-    Camera, File, DatePicker, SqliteDbCopy, AndroidPermissions, PhotoLibrary],
+    Camera, File, DatePicker, SqliteDbCopy, AndroidPermissions],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

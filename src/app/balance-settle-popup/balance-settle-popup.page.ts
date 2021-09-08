@@ -95,7 +95,9 @@ export class BalanceSettlePopupPage implements OnInit {
 
   success() {
     alert('Balance updated successfully');
+    if (this.params.type === 'balancelist') {
     this.db.balSettle.next('updated');
+    }
     this.viewCtrl.dismiss('update');
   }
 

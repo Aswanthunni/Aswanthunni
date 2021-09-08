@@ -9,11 +9,15 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="home-content">
+  <ion-fab vertical="bottom" horizontal="start" slot="fixed">
+    <ion-fab-button (click)="navigate('/dues')" color="danger">
+      <p style="font-weight: bold;">Dues</p>
+    </ion-fab-button>
+  </ion-fab>
         <ion-list class="home-list">
           <ion-item (click)="navigate('/customer-mgmt')"><ion-label>Customer Management</ion-label></ion-item>
           <ion-item (click)="navigate('/add-package')"><ion-label>Package</ion-label></ion-item>
           <ion-item (click)="navigate('/additional-package')"><ion-label>Additional Package</ion-label></ion-item>
-          <ion-item (click)="navigate('/dues')"><ion-label>Dues</ion-label></ion-item>
           <ion-item (click)="navigate('/history-customer-list/report')"><ion-label>Payment Report</ion-label></ion-item>
           <ion-item (click)="navigate('/balance-due')"><ion-label>Due Settle</ion-label></ion-item>
           <ion-item (click)="navigate('/history-customer-list/trans')"><ion-label>Transactions</ion-label></ion-item>

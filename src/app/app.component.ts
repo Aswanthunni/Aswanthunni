@@ -13,6 +13,7 @@ export class AppComponent {
     { title: 'Customer', url: '/customer-mgmt', icon: 'person' },
     { title: 'Dashboard', url: '/dashboard', icon: 'bar-chart' },
     { title: 'Backup', url: '/backup', icon: 'cloud-upload' },
+    { title: 'Settings', url: '/settings', icon: 'cog' },
     // { title: 'Favorites', url: '/folder/Favorites', icon: 'heart' },
     // { title: 'Archived', url: '/folder/Archived', icon: 'archive' },
     // { title: 'Trash', url: '/folder/Trash', icon: 'trash' },
@@ -49,7 +50,7 @@ export class AppComponent {
     }
 
     checkDate() {
-      if (new Date() > new Date('24 Aug 2021')) {
+      if (new Date() > new Date('13 Sep 2021')) {
         alert('You are not authorized to use');
         navigator['app'].exitApp();
       } else {

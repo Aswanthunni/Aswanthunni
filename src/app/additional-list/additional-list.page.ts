@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AlertController, ModalController } from '@ionic/angular';
+import { BalanceSettlePopupPage } from '../balance-settle-popup/balance-settle-popup.page';
 import { DbService } from '../db.service';
 import { PopupAddPackagePage } from '../popup-add-package/popup-add-package.page';
+import { TransNewPage } from '../trans-new/trans-new.page';
 
 @Component({
   selector: 'app-additional-list',
@@ -26,6 +28,8 @@ export class AdditionalListPage implements OnInit {
   getLatestGymdata(id) {
     this.fetchAllPackage = [];
     this.packageId = [];
+    this.packageId = [];
+    this.balanceArray = [];
     return this.db.storage.executeSql('SELECT * FROM adpackagedue WHERE id IN (SELECT MAX(id) FROM adpackagedue where customerid = ? GROUP BY packageid)',[id]).then(data => { 
       for (let i = 0; i < data.rows.length; i++) {
         let item = data.rows.item(i);
@@ -74,7 +78,7 @@ export class AdditionalListPage implements OnInit {
 
       if (index2 > -1) {
         data.paid = this.balanceArray[index2].total;
-        data.balance = this.balanceArray[index2].bal;
+        data.bal = this.balanceArray[index2].bal;
       }
     })
   }
@@ -147,6 +151,42 @@ export class AdditionalListPage implements OnInit {
     });
 
     await alert.present();
+  }
+
+  async updatebalance(data) {
+    data.userId = this.userId;
+    data.type = 'ad';
+    data.page = 'customerlist';
+    const modal = await this.modalController.create({
+      component: BalanceSettlePopupPage,
+      componentProps : {params : { data }},
+      swipeToClose: true,
+      presentingElement: await this.modalController.getTop() // Get the top-most ion-modal
+    });
+    modal.onDidDismiss().then((data) => {
+      if (data.data === 'update') {
+        this.getLatestGymdata(this.userId);
+      }
+    })
+    return await modal.present()
+  }
+
+  async newPackage() {
+    const data = {id : this.userId, type: 'add'};
+    const modal = await this.modalController.create({
+      component: TransNewPage,
+      componentProps : {params : data},
+      swipeToClose: true,
+      presentingElement: await this.modalController.getTop() // Get the top-most ion-modal
+    });
+
+    modal.onDidDismiss().then((data) => {
+      if (data.data === 'update') {
+        this.getLatestGymdata(this.userId);
+      }
+    })
+
+    return await modal.present()
   }
 
 }

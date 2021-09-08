@@ -32,12 +32,12 @@
         <ion-row>
           <ion-col>
             <p>Total Paid :</p>
-            <p>{{i.paid}}</p>
+            <p>₹{{i.paid}}</p>
           </ion-col>
           <ion-col>
-           <p>Balance Amount :</p>
-           <p>{{i.balance}}</p>
-          </ion-col>
+            <p>Balance Amount :</p>
+            <p style="color: red; font-weight: bold;">₹{{i.bal}}</p>
+           </ion-col>
         </ion-row>
         <ion-row>
           <ion-col *ngIf="i.isactive == 1">
@@ -45,6 +45,14 @@
           </ion-col>
           <ion-col *ngIf="i.isactive == 0">
               <ion-button type="submit" color="danger" expand="block" [disabled]="true">DeActivated</ion-button>
+          </ion-col>
+        </ion-row>
+        <ion-row *ngIf="i.isactive == 1">
+          <ion-col>
+           <ion-button type="submit" color="secondary" expand="block" (click)="updatebalance(i)" [disabled]="+i.bal === 0">Due Settle</ion-button>
+          </ion-col>
+          <ion-col>
+           <ion-button type="submit" color="primary" expand="block" (click)="newPackage()">New Payment</ion-button>
           </ion-col>
         </ion-row>
        <ion-row *ngIf="i.isactive == 1">
