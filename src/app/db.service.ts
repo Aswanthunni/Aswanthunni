@@ -6,6 +6,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
 import { File } from '@ionic-native/file/ngx';
+import { Device } from '@ionic-native/device/ngx';
 
 export interface Song {
   id: number;
@@ -31,7 +32,8 @@ export class DbService {
     private httpClient: HttpClient,
     private sqlPorter: SQLitePorter,
     public loadingController: LoadingController,
-    public file: File
+    public file: File,
+    private device: Device
   ) {
     this.platform.ready().then(() => {
       this.sqlite.create({
@@ -73,6 +75,7 @@ export class DbService {
         .then(_ => {
           // this.getSongs();
           //  this.isDbReady.next(true);
+          this.insertUid();
         })
         .catch(error => alert(JSON.stringify(error)));
     });
@@ -92,6 +95,13 @@ export class DbService {
       .then(res => {
         this.getSongs();
       });
+  }
+
+  insertUid() {
+    let data = [this.device.uuid];
+    return this.storage.executeSql('INSERT INTO uniqueid (uid) VALUES (?)', data)
+    .then(res => {
+    });
   }
 
   // Get single object

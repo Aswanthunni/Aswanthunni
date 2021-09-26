@@ -24,6 +24,7 @@
     "@ionic-native/camera": "^5.35.0",
     "@ionic-native/core": "^5.35.0",
     "@ionic-native/date-picker": "^5.35.0",
+    "@ionic-native/device": "^5.36.0",
     "@ionic-native/file": "^5.35.0",
     "@ionic-native/sqlite": "^5.35.0",
     "@ionic-native/sqlite-db-copy": "^5.35.0",

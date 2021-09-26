@@ -163,6 +163,7 @@ export class AddCustomerPage implements OnInit {
     // this.customerForm.controls.adpackage.setValue(res.name);
     this.getSanitizedImage(this.file.externalRootDirectory + 'Pictures/Gym Album/', res.img);
   //  this.croppedImagepath = res.img;
+    this.imagePath = res.img;
   }
 
   pickImage(sourceType, type= 'cam') {
@@ -232,7 +233,7 @@ export class AddCustomerPage implements OnInit {
     this.datePicker.show({
       date: date,
       mode: 'date',
-      androidTheme: this.datePicker.ANDROID_THEMES.THEME_HOLO_DARK
+      androidTheme: this.datePicker.ANDROID_THEMES.THEME_DEVICE_DEFAULT_LIGHT
     }).then(
       (dateTime) => {
         const dFormat = dateTime.getDate()+" "+dateTime.toLocaleString('default', { month: 'short' })+" "+dateTime.getFullYear();

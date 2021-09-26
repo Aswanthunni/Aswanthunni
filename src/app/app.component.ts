@@ -31,7 +31,6 @@ export class AppComponent {
   });
   }
 
-
   getPermission() {
     this.androidPermissions.hasPermission(this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE)
       .then(status => {
@@ -50,7 +49,7 @@ export class AppComponent {
     }
 
     checkDate() {
-      if (new Date() > new Date('13 Sep 2021')) {
+      if (new Date() > new Date('29 Sep 2021')) {
         alert('You are not authorized to use');
         navigator['app'].exitApp();
       } else {
