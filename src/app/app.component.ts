@@ -2,6 +2,8 @@ import { AfterViewInit, Component } from '@angular/core';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { NavController, Platform } from '@ionic/angular';
 import { DbService } from './db.service';
+import { Device } from '@ionic-native/device/ngx';
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -20,13 +22,14 @@ export class AppComponent {
     // { title: 'Spam', url: '/folder/Spam', icon: 'warning' },
   ];
   public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
-  constructor(public db: DbService, private androidPermissions: AndroidPermissions, private platform: Platform, private nav: NavController) {
+  constructor(public db: DbService, private androidPermissions: AndroidPermissions, private platform: Platform, private nav: NavController, private device: Device) {
   }
   ngOnInit(): void {
     this.platform.ready().then(() => {
       if(this.platform.is('android')) {
         this.getPermission();
-        this.checkDate();
+      //  this.checkDate();
+        this.checkUid();
       }
   });
   }
@@ -49,11 +52,16 @@ export class AppComponent {
     }
 
     checkDate() {
-      if (new Date() > new Date('29 Sep 2021')) {
+      if (new Date() > new Date('08 Oct 2021')) {
+        alert('Your app access is expired');
+        navigator['app'].exitApp();
+      }
+    }
+
+    checkUid() {
+      if (this.device.uuid !== '0d4b660d79b27abd') {
         alert('You are not authorized to use');
         navigator['app'].exitApp();
-      } else {
-     //  this.nav.navigateRoot('/login');
       }
     }
 }

@@ -20,6 +20,13 @@
   <ion-list>
     <ion-virtual-scroll [items]="customerData" *ngIf="customerData.length" approxItemHeight="68px" [itemHeight]="itemHeightFn">
       <ion-item-sliding *virtualItem="let item">
+
+        <ion-item-options side="start">
+          <ion-item-option (click)="imagePreview(item.img)">
+            <ion-icon slot="icon-only" name="eye"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+
         <ion-item-options side="end">
           <ion-item-option (click)="navigateEdit(item.id)">
             <ion-icon slot="icon-only" name="pencil"></ion-icon>
@@ -30,7 +37,7 @@
         </ion-item-options>
     
         <ion-item (click)="navigatePackage(item.id)">
-          <ion-avatar style="margin: auto;" (click)="imagePreview(item.img)">
+          <ion-avatar style="margin: auto;">
             <img  [src]="item.img">
           </ion-avatar>
           <ion-label style="margin-left: 1rem;">
